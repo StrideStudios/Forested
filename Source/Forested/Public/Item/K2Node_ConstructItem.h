@@ -1,5 +1,7 @@
 #pragma once
 
+#if WITH_EDITOR
+
 #include "CoreMinimal.h"
 #include "K2Node_ConstructObjectFromClass.h"
 #include "K2Node_ConstructItem.generated.h"
@@ -29,3 +31,5 @@ class FORESTED_API UK2Node_ConstructItem : public UK2Node_ConstructObjectFromCla
 
 	virtual bool UseOuter() const override { return false; }
 };
+
+#endif

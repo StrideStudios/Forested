@@ -1,4 +1,7 @@
 #include "Item/K2Node_ConstructItem.h"
+
+#if WITH_EDITOR
+
 #include "K2Node_CallFunction.h"
 #include "KismetCompilerMisc.h"
 #include "KismetCompiler.h"
@@ -127,3 +130,5 @@ UClass* UK2Node_ConstructItem::GetClassPinBaseClass() const {
 }
 
 #undef LOCTEXT_NAMESPACE
+
+#endif
