@@ -48,8 +48,7 @@ SourceArt/**/*.png
 SourceArt/**/*.tga
 
 # Textures
-*.uasset
-*.umap
+*T_*.uasset
 
 # Binary Files
 Binaries/
