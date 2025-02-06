@@ -18,7 +18,7 @@ void UUnderwaterSubsystem::Initialize(FSubsystemCollectionBase& Collection) {
 	UWorld* World = GetWorld();
 	check(World);
 
-	const TSoftObjectPtr<UMaterialParameterCollection> SoftMaterialParameterCollection(FSoftObjectPath(TEXT("/Game/Geometry/MPC_Water.MPC_Water")));
+	const TSoftObjectPtr<UMaterialParameterCollection> SoftMaterialParameterCollection(FSoftObjectPath(TEXT("/Game/Geometry/ParameterCollections/MPC_Water.MPC_Water")));
 	FSerializationLibrary::LoadSync(SoftMaterialParameterCollection);
 	MaterialParameterCollection = SoftMaterialParameterCollection.Get();
 	

@@ -12,7 +12,7 @@ void USplineRenderComponent::BeginPlay() {
 }
 
 void USplineRenderComponent::RefreshSplineComponent() {
-	//ClearComponents();
+	ClearComponents();
 
 	AActor* Outer = GetOwner();
 	if (!Outer || !IN_WORLD) return;
