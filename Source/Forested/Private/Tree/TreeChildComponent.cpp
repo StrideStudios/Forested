@@ -39,6 +39,10 @@ bool UProductComponent::SpawnItemActor() {
 			UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, FallNiagaraSystem, GetComponentLocation(), GetComponentRotation(), GetComponentScale());
 		return true;
 	}
+	if (!Item) {
+		LOG_ERROR("Item needs to be set for product components to function properly.");
+		return false;
+	}
 	Item->CurrentGrowth = GetCurrentGrowth();
 	AItemActor::SpawnItemActor(GetWorld(), GetComponentTransform(), Item);
 	return true;

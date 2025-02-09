@@ -115,6 +115,7 @@ public:
 		return IsNight() ? GetMoonHeight() : GetSunHeight();
 	}
 
+	//0.f at sunset, 1.f at noon, and -1.f at midnight
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Sky")
 	FORCEINLINE float GetSunHeight() const {
 		return Sun ? FMath::GetMappedRangeValueUnclamped(FVector2D(0.f, -90.f), FVector2D(0.f, 1.f), Sun->GetComponentRotation().Pitch) : 0.f;
@@ -385,12 +386,6 @@ protected:
 
 private:
 
-	FORCEINLINE double GetDayLength_Internal(const int InDay) const {
-		const double LatitudeRad = FMath::DegreesToRadians(Latitude);
-		const double Declination = FMath::DegreesToRadians(-23.45f * FMath::Cos(FMath::DegreesToRadians(360.f/365.f * (InDay + 10))));
-		return FMath::Acos(-FMath::Tan(LatitudeRad)*FMath::Tan(Declination)) / PI;
-	}
-	
 	void AddTimedEvent_Internal(const FTimedEventDelegate& Complete, float ExecuteTime = 0.f);
 
 	void AddTimer_Internal(const FTimedEventDelegate& Complete, const FTimedEventDelegate& Update, float ExecuteTime = 0.f);
@@ -410,12 +405,6 @@ private:
 	
 	// Set this to GFrameCounter when Timer is ticked. To figure out if Timer has been already ticked or not this frame.
 	uint64 LastTickedFrame = static_cast<uint64>(-1);
-	
-	//array of floats of size 365 to store the length of days
-	std::array<double, 365> DayLengths = {};
-
-	//array of floats of size 365 to store accumulated day time
-	std::array<float, 365> TotalDaytime = {};
 
 	int PendingCounter = 0;
 	

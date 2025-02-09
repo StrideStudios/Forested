@@ -15,9 +15,6 @@
 ASky::ASky(){
 	PrimaryActorTick.bCanEverTick = true;
 	
-	DayLengths.fill(0.0);
-	TotalDaytime.fill(0.0);
-	
 	SetActorEnableCollision(false);
 	EarthLocationComponent = CreateDefaultSubobject<USceneComponent>(TEXT("EarthLocationComponent"));
 	RootComponent = EarthLocationComponent;
@@ -34,7 +31,7 @@ ASky::ASky(){
 	MoonMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Moon Mesh"));
 	MoonMesh->SetupAttachment(MoonMovementComponent);
 	Sun = CreateDefaultSubobject<UDirectionalLightComponent>(TEXT("Sun"));
-	Sun->SetupAttachment(EarthMovementComponent);
+	Sun->SetupAttachment(RootComponent);
 	Moon = CreateDefaultSubobject<UDirectionalLightComponent>(TEXT("Moon"));
 	Moon->SetupAttachment(MoonMovementComponent);
 	VolumetricCloud = CreateDefaultSubobject<UVolumetricCloudComponent>(TEXT("Volumetric Cloud"));
@@ -52,13 +49,6 @@ ASky::ASky(){
 
 void ASky::BeginPlay() {
 	Super::BeginPlay();
-	double DayLengthAccumulated = 0.f;
-	for (int i = 0; i < 365; ++i) {
-		const double DayLength = GetDayLength_Internal(i + 1);
-		TotalDaytime[i] = DayLengthAccumulated;
-		DayLengths[i] = DayLength;
-		DayLengthAccumulated += DayLength;
-	}
 }
 
 void ASky::EndPlay(const EEndPlayReason::Type EndPlayReason) {
@@ -180,6 +170,11 @@ void ASky::RenderSky(const float DeltaTime) {
 		Sun->ShadowSharpen = ShadowSharpenOverride != 0.f ? ShadowSharpenOverride : SunShadowSettings->GetLinearColorValue(SunHeight).B;
 		Sun->SetDynamicShadowCascades(ShadowCascadesOverride != 0 ? ShadowCascadesOverride : FMath::FloorToInt(SunShadowSettings->GetLinearColorValue(SunHeight).A));
 	}
+
+	const double ScaledTime = TimeScale ? TimeScale->GetFloatValue(Time) : Time;
+	const double LatitudeRad = FMath::DegreesToRadians(Latitude);
+	const double YearDegree = (Day + ScaledTime) * 360.0 / 366.0;
+	const double YearDegreeRad = FMath::DegreesToRadians(YearDegree);
 	
 	/* ----- Moon Settings -----
 	 * Less Intense when low in the sky and when sun isn't pointing directly at it
@@ -199,30 +194,43 @@ void ASky::RenderSky(const float DeltaTime) {
 	Moon->SetLightingChannels(bMoonEnabled, false, false);
 	Moon->SetCastShadows(bMoonEnabled);
 	MoonMesh->SetWorldLocation(Moon->GetDirection()*-MoonDistance);
-	MoonMesh->SetWorldRotation(FRotator(Moon->GetDirection().ToOrientationRotator().Pitch, Moon->GetDirection().ToOrientationRotator().Yaw,Moon->GetComponentRotation().Roll-90.f));
-	Moon->SetRelativeRotation(FRotator((Day + Time) / -27.321528f * 360.f, 0.f, 0.f));
+	MoonMesh->SetWorldRotation(FRotator(Moon->GetDirection().ToOrientationRotator().Pitch, Moon->GetDirection().ToOrientationRotator().Yaw,Moon->GetComponentRotation().Roll+90.f));
+	Moon->SetRelativeRotation(FRotator((Day + Time) / 27.321528f * 360.f, 90.f, 0.f));
 	//Moon->ForwardShadingPriority = IsNight() ? 2 : 0; TODO: test volumetric without this
 	Moon->AtmosphereSunDiskColorScale = FLinearColor(FVector(MoonDiskBrightness));
+
+	//tilt the moon throughout the year
+	const float MoonComponentPitch = FMath::Cos(YearDegreeRad) * 5.145002f;
+	const float MoonComponentYaw = FMath::Sin(YearDegreeRad) * 5.145002f;
+
+	MoonMovementComponent->SetRelativeRotation(FRotator(MoonComponentPitch, MoonComponentYaw, 0.f));
 	
 	/* ----- Earth Movement -----
-	 * Earth moves which gives the appearance of the sun and moon moving
+	 * The sky and moon move which gives the appearance of Earth moving
 	 */
-
-	const double ScaledTime = TimeScale ? TimeScale->GetFloatValue(Time) : Time;
-	const double Declination = FMath::DegreesToRadians(-23.45 * FMath::Cos(FMath::DegreesToRadians(360.f/365.f * (Day + ScaledTime + 10))));
-	const double LatitudeRad = FMath::DegreesToRadians(Latitude);
+	
+	const double Declination = FMath::DegreesToRadians(23.45 * FMath::Sin(FMath::DegreesToRadians(360.0/365.0 * (Day + ScaledTime - 81))));
 	const double HalfDayLength =  FMath::Acos(-FMath::Tan(LatitudeRad)*FMath::Tan(Declination)) / (2.f * PI);
 	const double AdjustedDayTime = UKismetMathLibrary::MapRangeClamped(ScaledTime, 0.f, 0.5f, 0.5f - HalfDayLength, 0.5f + HalfDayLength);
 	const double AdjustedNightTime = FMath::Fmod(UKismetMathLibrary::MapRangeClamped(ScaledTime, 0.5f, 1.f, 0.5f + HalfDayLength, 0.5f - HalfDayLength + 1.f), 1.f);
 	const double AdjustedTime = IsNight() ? AdjustedNightTime : AdjustedDayTime;
-	const double HourAngle = FMath::DegreesToRadians(FMath::Fmod(AdjustedTime * 360.f, 360.f) - 180.f);
-	const double ZenithAngle = FMath::Acos(FMath::Sin(Declination)*FMath::Sin(LatitudeRad) + FMath::Cos(Declination)*FMath::Cos(LatitudeRad)*FMath::Cos(HourAngle));
-	const double Elevation = 180.f + 90.f - FMath::RadiansToDegrees(ZenithAngle);
-	const double PreAzimuth = FMath::RadiansToDegrees(FMath::Acos((FMath::Cos(ZenithAngle)*FMath::Sin(LatitudeRad) - FMath::Sin(Declination)) / (FMath::Sin(ZenithAngle)*FMath::Cos(LatitudeRad))));
-	const double Azimuth = HourAngle > 0.f ?  FMath::Fmod(PreAzimuth + 180.f, 360.f) : FMath::Fmod(540.f - PreAzimuth, 360.f);
+	const double HourAngle = FMath::Fmod(AdjustedTime * 360.f, 360.f) - 180.f;
+	const double HourAngleRad = FMath::DegreesToRadians(HourAngle);
+	const double Elevation = FMath::Asin(FMath::Sin(Declination)*FMath::Sin(LatitudeRad) + FMath::Cos(Declination)*FMath::Cos(LatitudeRad)*FMath::Cos(HourAngleRad));
+	const double ElevationDeg = 180.f + FMath::RadiansToDegrees(Elevation);
+	const double PreAzimuthRad = FMath::Acos((FMath::Sin(Declination)*FMath::Cos(LatitudeRad) - FMath::Cos(Declination)*FMath::Sin(LatitudeRad)*FMath::Cos(HourAngleRad)) / FMath::Cos(Elevation));
+	const double PreAzimuthDeg = 180.f - FMath::RadiansToDegrees(PreAzimuthRad);
+	const double Azimuth = HourAngle > 0.f ?  FMath::Fmod(PreAzimuthDeg + 180.f, 360.f) : FMath::Fmod(540.f - PreAzimuthDeg, 360.f);
 	
-	EarthMovementComponent->SetRelativeRotation(FRotator(Elevation, Azimuth, 0.f));
+	Sun->SetRelativeRotation(FRotator(ElevationDeg, Azimuth, 0.f));
 	
+	const double MaxAdjustedDayTime = UKismetMathLibrary::MapRangeClamped(ScaledTime, 0.f, 0.5f, 0.25f, 0.75f);
+	const double MaxAdjustedNightTime = FMath::Fmod(UKismetMathLibrary::MapRangeClamped(ScaledTime, 0.5f, 1.f, 0.75f, 1.25f), 1.f);
+	const double MaxAdjustedTime = IsNight() ? MaxAdjustedNightTime : MaxAdjustedDayTime;
+	const double MaxHourAngle = FMath::Fmod(MaxAdjustedTime * 360.f, 360.f) - 180.f;
+	
+	EarthMovementComponent->SetRelativeRotation(FRotator(-Latitude, 180.f, MaxHourAngle + YearDegree));
+
 	SkyDynamicMaterial->SetVectorParameterValue(TEXT("RotateAxis"), FLinearColor(FVector4(Sun->GetRightVector(), 0.f)));
 	SkyDynamicMaterial->SetScalarParameterValue(TEXT("SunBrightness"), Sun->Intensity);
 	SkyDynamicMaterial->SetScalarParameterValue(TEXT("SunHeight"), GetSunHeight());
