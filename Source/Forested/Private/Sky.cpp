@@ -34,6 +34,7 @@ ASky::ASky(){
 	MoonMesh->SetupAttachment(MoonMovementComponent);
 	Sun = CreateDefaultSubobject<UDirectionalLightComponent>(TEXT("Sun"));
 	Sun->SetupAttachment(RootComponent);
+	Sun->ForwardShadingPriority = 1;
 	Moon = CreateDefaultSubobject<UDirectionalLightComponent>(TEXT("Moon"));
 	Moon->SetupAttachment(MoonMovementComponent);
 	VolumetricCloud = CreateDefaultSubobject<UVolumetricCloudComponent>(TEXT("Volumetric Cloud"));
