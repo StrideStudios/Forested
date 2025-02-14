@@ -206,7 +206,7 @@ void ASky::RenderSky(const float DeltaTime) {
 	MoonMesh->SetWorldLocation(Moon->GetDirection()*-MoonDistance);
 	MoonMesh->SetWorldRotation(FRotator(Moon->GetDirection().ToOrientationRotator().Pitch, Moon->GetDirection().ToOrientationRotator().Yaw,Moon->GetComponentRotation().Roll+90.f));
 	Moon->SetRelativeRotation(FRotator((Day + Time) / 27.321528f * 360.f, 90.f, 0.f));
-	//Moon->ForwardShadingPriority = IsNight() ? 2 : 0; TODO: test volumetric without this
+	Moon->ForwardShadingPriority = IsNight() ? 2 : 0;
 	Moon->AtmosphereSunDiskColorScale = FLinearColor(FVector(MoonDiskBrightness));
 
 	//tilt the moon throughout the year
