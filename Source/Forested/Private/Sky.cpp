@@ -1,5 +1,4 @@
 #include "Sky.h"
-#include "Forested/Forested.h"
 #include "ForestedLibrary.h"
 #include "FPlayer.h"
 #include "Components/VolumetricCloudComponent.h" 
@@ -11,6 +10,9 @@
 #include "Components/SkyAtmosphereComponent.h"
 #include "Components/SkyLightComponent.h"
 #include "Materials/MaterialInstanceDynamic.h"
+#include "Materials/MaterialParameterCollection.h"
+#include "Materials/MaterialParameterCollectionInstance.h"
+#include "UObject/ConstructorHelpers.h"
 
 ASky::ASky(){
 	PrimaryActorTick.bCanEverTick = true;
@@ -45,10 +47,16 @@ ASky::ASky(){
 	NorthDirection = CreateDefaultSubobject<UArrowComponent>(TEXT("North Direction"));
 	NorthDirection->SetupAttachment(RootComponent);
 	NorthDirection->ArrowSize = 1.f;
+
+	const ConstructorHelpers::FObjectFinder<UMaterialParameterCollection> ParameterCollection(TEXT("/Game/Geometry/ParameterCollections/MPC_Sky.MPC_Sky"));
+	if (ParameterCollection.Succeeded()) {
+		SkyCollection = ParameterCollection.Object;
+	}
 }
 
 void ASky::BeginPlay() {
 	Super::BeginPlay();
+	
 }
 
 void ASky::EndPlay(const EEndPlayReason::Type EndPlayReason) {
@@ -126,20 +134,22 @@ void ASky::OnConstruction(const FTransform& ActorTransform){
 }
 
 void ASky::GetWindDirectionAndSpeed(FVector& WindDirection, float& WindSpeed) const {
-	WindDirection = FVector(1.f, 0.5f, 0.05f);
-	WindSpeed = 100.f;
+	if (!SkyCollection || !GetWorld()) return;
+	const UMaterialParameterCollectionInstance* SkyCollectionInstance = GetWorld()->GetParameterCollectionInstance(SkyCollection);
+	FLinearColor OutWindDirection;
+	SkyCollectionInstance->GetVectorParameterValue("WindDirection", OutWindDirection);
+	WindDirection = FVector(OutWindDirection);
+	SkyCollectionInstance->GetScalarParameterValue("WindSpeed", WindSpeed);
 }
 
-//TODO: set wind direction and wind axis
-
 void ASky::RenderSky(const float DeltaTime) {
-
+	
 	/* ----- Fog Settings -----
 	 * More dense fog closer to sunset and during rain
 	 */
 	
-	SkyAtmosphere->SetRayleighScattering(FMath::Lerp(ClearRayleighScattering, RainRayleighScattering, IsRaining));
-	ExponentialHeightFog->SetFogDensity(UKismetMathLibrary::Ease(0.006f, 0.004f, FMath::Clamp(GetSunHeight(), 0.f, 1.f), EEasingFunc::EaseOut, 4.f) + UKismetMathLibrary::Ease(0.f, 0.01f, IsRaining, EEasingFunc::EaseIn, 6.f));
+	SkyAtmosphere->SetRayleighScattering(FMath::Lerp(ClearRayleighScattering, RainRayleighScattering, GetRainValue()));
+	ExponentialHeightFog->SetFogDensity(UKismetMathLibrary::Ease(0.006f, 0.004f, FMath::Clamp(GetSunHeight(), 0.f, 1.f), EEasingFunc::EaseOut, 4.f) + UKismetMathLibrary::Ease(0.f, 0.01f, GetRainValue(), EEasingFunc::EaseIn, 6.f));
 	ExponentialHeightFog->SecondFogData.FogDensity = UKismetMathLibrary::Ease(0.005f, 0.01f, FMath::Abs(GetSunHeight()), EEasingFunc::EaseOut, 4.f);
 	ExponentialHeightFog->SetVolumetricFogExtinctionScale(FMath::Lerp(
 		UKismetMathLibrary::Ease(0.5f, 1.f, FMath::Clamp(GetSunHeight() * -1.f, 0.f, 1.f), EEasingFunc::EaseIn, 0.75f),
@@ -153,8 +163,8 @@ void ASky::RenderSky(const float DeltaTime) {
 	 * some functions will lower intensity while keeping its effect on the sky
 	 */
 	
-	Sun->SetIntensity(UKismetMathLibrary::Ease(10.f, 2.f, IsRaining, EEasingFunc::EaseIn, 2.f));
-	Sun->SetTemperature(FMath::Lerp(5500.f, 6500.f, IsRaining));
+	Sun->SetIntensity(UKismetMathLibrary::Ease(10.f, 2.f, GetRainValue(), EEasingFunc::EaseIn, 2.f));
+	Sun->SetTemperature(FMath::Lerp(5500.f, 6500.f, GetRainValue()));
 	Sun->SetBloomScale(IsNight() ? 0.125f: UKismetMathLibrary::FInterpTo(Sun->BloomScale, 0.125f/*SeeLight ? 0.125f : 0.f*/, DeltaTime, 0.1f));
 	Sun->SetLightFunctionDisabledBrightness(IsNight() ? 0.f : UKismetMathLibrary::FInterpTo(Sun->DisabledBrightness, 1.f/*see light ? 1.f : 0.f*/, DeltaTime, 0.1f));
 	Sun->SetOcclusionMaskDarkness(IsNight() ? 1.f : UKismetMathLibrary::FInterpTo(Sun->OcclusionMaskDarkness, 0.05f/*SeeLight ? 0.05f : 1.f*/, DeltaTime, 0.1f));
@@ -182,8 +192,8 @@ void ASky::RenderSky(const float DeltaTime) {
 	
 	const float MoonDirectionalIntensity = FMath::Pow(UKismetMathLibrary::MapRangeClamped(UKismetMathLibrary::Dot_VectorVector(GetSunDirection(), GetMoonDirection()) * -1.f, -1.f, 1.f, 0.f, 1.f), 4.f);
 	const float MoonHeightIntensity = UKismetMathLibrary::MapRangeClamped(FMath::Abs(GetMoonHeight()), 0.05f, 0.5f, 0.f, 1.f);
-	Moon->SetIntensity(UKismetMathLibrary::Ease(0.25f, 0.05f, IsRaining, EEasingFunc::EaseIn, 2.f) * MoonDirectionalIntensity * MoonHeightIntensity);
-	Moon->SetTemperature(FMath::Lerp(10000.f, 11000.f, IsRaining));
+	Moon->SetIntensity(UKismetMathLibrary::Ease(0.25f, 0.05f, GetRainValue(), EEasingFunc::EaseIn, 2.f) * MoonDirectionalIntensity * MoonHeightIntensity);
+	Moon->SetTemperature(FMath::Lerp(10000.f, 11000.f, GetRainValue()));
 	Moon->SetBloomScale(IsNight() ? UKismetMathLibrary::FInterpTo(Moon->BloomScale, 0.125f/*SeeLight ? 0.125f : 0.f*/, DeltaTime, 0.1f) : 0.f);
 
 	const float MoonColor = 1.f / MoonDirectionalIntensity * 0.0075f;
@@ -237,8 +247,24 @@ void ASky::RenderSky(const float DeltaTime) {
 	SkyDynamicMaterial->SetScalarParameterValue(TEXT("GalaxyBrightness"), GalaxyBrightness);
 	SkyDynamicMaterial->SetScalarParameterValue(TEXT("StarBrightness"), StarBrightness);
 	MoonDynamicMaterial->SetVectorParameterValue(TEXT("SunVector"), GetSunDirection());
+
+	if (SkyCollection && GetWorld()) {
+		UMaterialParameterCollectionInstance* SkyCollectionInstance = GetWorld()->GetParameterCollectionInstance(SkyCollection);
+		SkyCollectionInstance->SetScalarParameterValue("SunHeight", GetSunHeight());
+		SkyCollectionInstance->SetScalarParameterValue("SkyTime", GetTimePassed());
+		SkyCollectionInstance->SetScalarParameterValue("DayTime", GetDaytimePassed());
+		SkyCollectionInstance->SetScalarParameterValue("NightTime", GetNighttimePassed());
+	}
+	
 	this->ReceiveRenderSky(DeltaTime, this);
 	OnSkyUpdate.Broadcast(DeltaTime, this);
+}
+
+void ASky::SetRainValue(const float InRainValue) {
+	RainValue = InRainValue;
+	if (!SkyCollection || !GetWorld()) return;
+	UMaterialParameterCollectionInstance* SkyCollectionInstance = GetWorld()->GetParameterCollectionInstance(SkyCollection);
+	SkyCollectionInstance->SetScalarParameterValue("RainValue", RainValue);
 }
 
 void ASky::AddTimedEvent_Internal(const FTimedEventDelegate& Complete, const float ExecuteTime) {

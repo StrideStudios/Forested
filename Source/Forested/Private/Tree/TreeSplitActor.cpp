@@ -5,7 +5,6 @@
 #include "LevelDefaults.h"
 #include "Components/BoxComponent.h"
 #include "Components/SphereComponent.h"
-#include "Forested/Forested.h"
 #include "Tree/TreeActor.h"
 
 ATreeSplitActor::ATreeSplitActor() {

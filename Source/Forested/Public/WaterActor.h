@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Forested/ForestedMinimal.h"
 #include "SplineRenderComponent.h"
 #include "GameFramework/Actor.h"
 #include "Interfaces/Interface_PostProcessVolume.h"

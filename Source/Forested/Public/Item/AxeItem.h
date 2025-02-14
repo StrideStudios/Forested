@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Forested/ForestedMinimal.h"
 #include "AxeHeadItem.h"
 #include "AxeHandleItem.h"
 #include "Item.h"

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Forested/ForestedMinimal.h"
 #include "GameFramework/GameModeBase.h"
 #include "ForestedGameMode.generated.h"
 

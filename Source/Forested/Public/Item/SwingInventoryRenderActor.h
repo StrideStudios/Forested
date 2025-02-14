@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Forested/ForestedMinimal.h"
 #include "AlphaBlend.h"
 #include "DamageableInterface.h"
 #include "PlayerInventoryActor.h"

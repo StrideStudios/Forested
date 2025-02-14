@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Forested/ForestedMinimal.h"
 #include "SelectableInterface.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "OpenableComponent.generated.h"

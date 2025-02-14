@@ -1,6 +1,5 @@
 #include "SerializationLibrary.h"
 #include "Engine/AssetManager.h"
-#include "Forested/Forested.h"
 
 TSharedPtr<FStreamableHandle> FSerializationLibrary::LoadSync_Internal(const TArray<FSoftObjectPath>& TargetsToStream) {
 	return UAssetManager::GetStreamableManager().RequestSyncLoad(TargetsToStream);

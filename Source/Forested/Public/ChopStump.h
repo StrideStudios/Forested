@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Forested/ForestedMinimal.h"
 #include "DamageableInterface.h"
 #include "Item/InventoryActor.h"
 #include "ChopStump.generated.h"

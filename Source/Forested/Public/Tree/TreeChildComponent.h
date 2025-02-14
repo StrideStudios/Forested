@@ -1,8 +1,7 @@
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Forested/ForestedMinimal.h"
 #include "CullStaticMeshComponent.h"
-#include "Forested/Forested.h"
 #include "Item/Item.h"
 #include "Item/ItemActor.h"
 #include "Item/PlayerInventory.h"

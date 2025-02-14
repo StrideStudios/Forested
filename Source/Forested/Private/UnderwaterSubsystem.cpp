@@ -5,7 +5,6 @@
 #include "SerializationLibrary.h"
 #include "WaterActor.h"
 #include "Camera/CameraComponent.h"
-#include "Forested/Forested.h"
 #include "Materials/MaterialParameterCollection.h"
 #include "Materials/MaterialParameterCollectionInstance.h"
 

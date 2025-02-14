@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Forested/ForestedMinimal.h"
 #include "Engine/StreamableManager.h"
 #include "Kismet/BlueprintAsyncActionBase.h"
 #include "SerializationLibrary.generated.h"

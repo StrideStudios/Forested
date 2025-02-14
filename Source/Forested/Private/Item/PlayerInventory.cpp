@@ -8,7 +8,6 @@
 #include "Camera/CameraComponent.h"
 #include "Engine/AssetManager.h"
 #include "Engine/StreamableManager.h"
-#include "Forested/Forested.h"
 #include "Item/Inventory.h"
 #include "Tree/TreeActor.h"
 #include "SerializationLibrary.h"

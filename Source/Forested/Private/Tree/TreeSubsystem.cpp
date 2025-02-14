@@ -1,6 +1,5 @@
 #include "Tree/TreeSubsystem.h"
 #include "Components/HierarchicalInstancedStaticMeshComponent.h"
-#include "Forested/Forested.h"
 #include "Tree/TreeActor.h"
 
 //TODO: dirt movement on creation

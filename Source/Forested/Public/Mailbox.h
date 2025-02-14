@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Forested/ForestedMinimal.h"
 #include "PlayerWidget.h"
 #include "SelectableInterface.h"
 #include "Blueprint/UserWidget.h"

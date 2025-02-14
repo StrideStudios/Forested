@@ -3,7 +3,6 @@
 #include "FPlayer.h"
 #include "Components/SplineComponent.h"
 #include "Components/SplineMeshComponent.h" 
-#include "Forested/Forested.h"
 
 UWaterSplineComponent::UWaterSplineComponent() {
 	PrimaryComponentTick.bCanEverTick = false;

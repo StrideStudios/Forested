@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Forested/ForestedMinimal.h"
 #include "Item.h"
 #include "Tree/TreeChildActor.h"
 #include "SeedItem.generated.h"

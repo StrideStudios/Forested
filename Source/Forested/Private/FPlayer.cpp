@@ -16,7 +16,6 @@
 #include "ViewmodelMeshes.h"
 #include "Components/SphereComponent.h"
 #include "Engine/GameViewportClient.h"
-#include "Forested/Forested.h"
 #include "Kismet/KismetMathLibrary.h"
 
 AFPlayer::AFPlayer(const FObjectInitializer& ObjectInitializer) :

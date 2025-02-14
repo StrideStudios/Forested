@@ -1,10 +1,9 @@
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Forested/ForestedMinimal.h"
 #include "GameFramework/SaveGame.h"
 #include "UObject/Interface.h"
 #include "ObjectData.h"
-#include "Forested/Forested.h"
 #include "ObjectSaveGame.generated.h"
 
 /* https://forums.unrealengine.com/t/how-to-can-you-store-an-object-into-a-savegame/605261/4

@@ -2,7 +2,7 @@
 
 #if WITH_EDITOR
 
-#include "CoreMinimal.h"
+#include "Forested/ForestedMinimal.h"
 #include "K2Node_ConstructObjectFromClass.h"
 #include "K2Node_ConstructItem.generated.h"
 

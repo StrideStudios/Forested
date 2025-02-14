@@ -4,7 +4,6 @@
 #include "LevelDefaults.h"
 #include "Components/BoxComponent.h"
 #include "Sky.h"
-#include "Forested/Forested.h"
 #include "Item/ItemActor.h"
 
 ASellShop::ASellShop() {

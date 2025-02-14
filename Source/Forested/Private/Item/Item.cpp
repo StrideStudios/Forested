@@ -1,7 +1,5 @@
 #include "Item/Item.h"
 
-#include "Forested/Forested.h"
-
 UItem* UItem::ConstructItem(const UObject* WorldContextObject, const TSubclassOf<UItem> ItemClass) {
 	if (!ItemClass) {
 		LOG_WARNING("UItem::ConstructItem no class specified");

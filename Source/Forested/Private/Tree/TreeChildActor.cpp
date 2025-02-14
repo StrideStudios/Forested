@@ -8,7 +8,6 @@
 #include "LevelDefaults.h"
 #include "FPlayer.h"
 #include "Components/HierarchicalInstancedStaticMeshComponent.h"
-#include "Forested/Forested.h"
 
 //tree mesh seems to be too large, could be because beginplay?
 ATreeChildActor::ATreeChildActor() {

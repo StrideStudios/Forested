@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Forested/ForestedMinimal.h"
 #include "UObject/Interface.h"
 #include "Item/Item.h"
 #include "RecipeInterface.generated.h"

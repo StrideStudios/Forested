@@ -1,7 +1,6 @@
 #pragma once
 
-#include "CoreMinimal.h"
-#include "Forested/Forested.h"
+#include "Forested/ForestedMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "Tree/TreeSubsystem.h"

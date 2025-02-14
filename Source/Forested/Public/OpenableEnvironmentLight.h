@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Forested/ForestedMinimal.h"
 #include "EnvironmentLight.h"
 #include "OpenableEnvironmentLight.generated.h"
 

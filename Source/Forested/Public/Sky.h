@@ -1,8 +1,6 @@
 #pragma once
 
-#include <array>
-
-#include "CoreMinimal.h"
+#include "Forested/ForestedMinimal.h"
 #include "ObjectSaveGame.h"
 #include "GameFramework/Actor.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -73,6 +71,9 @@ public:
 		return "Sky";
 	}
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Sky")
+	FORCEINLINE UMaterialParameterCollection* GetSkyCollection() const { return SkyCollection; }
+
 	/**
 	* 0-0.25 is spring, 0.25-0.5 is summer, 0.5-0.75 is fall, 0.75-1 is winter
 	* assume season from day + time; spring starts on March 19, 20, or 21 (78/79/80); summer starts on June 20 or 21 (171/172); fall starts on September 22 or 23 (265/266); winter starts on December 21 or 22 (355/356);  (roughly 90 days per season)
@@ -109,7 +110,17 @@ public:
 	FORCEINLINE	bool IsNight() const {
 		return (TimeScale ? TimeScale->GetFloatValue(Time) : Time) > 0.5f;//GetSunHeight() < 0.0;
 	}
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Sky")
+	FORCEINLINE	bool IsRaining() const {
+		return GetRainValue() > 0.f;
+	}
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Sky")
+	FORCEINLINE	float GetRainValue() const {
+		return RainValue;
+	}
+	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Sky")
 	FORCEINLINE float GetLightHeight() const {
 		return IsNight() ? GetMoonHeight() : GetSunHeight();
@@ -196,6 +207,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, DisplayName = "Render Sky", Category = "Sky")
 	void ReceiveRenderSky(float DeltaTime, ASky* Sky);
 
+	UFUNCTION()
+	void SetRainValue(float InRainValue);
+
 	UPROPERTY(BlueprintAssignable)
 	FOnNewDay OnNewDay;
 
@@ -264,6 +278,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, SaveGame, Category = "Time", meta = (ClampMin = "0.0", UIMin = "0.0"))
 	int Year = 0;
 
+	UPROPERTY(BlueprintReadOnly, SaveGame, Category = "Time|Rain")
+	float RainValue = 0.f;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Time")
 	float DayTimeSpeedInSecondsPerDay = 1200.f;
 
@@ -273,11 +290,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Time")
 	UCurveFloat* TimeScale;
 
-public:
+	UPROPERTY()
+	UMaterialParameterCollection* SkyCollection;
 
-	// TODO: editable by function
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Time|Rain", meta = (ClampMin = "0.0", ClampMax = "1.0", UIMin = "0.0", UIMax = "1.0"))
-	float IsRaining = 0.f;
+public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Time|Rain")
 	FLinearColor ClearRayleighScattering = FLinearColor(0.175287f, 0.409607f, 1.f);

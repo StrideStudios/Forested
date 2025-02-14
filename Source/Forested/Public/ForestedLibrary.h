@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Forested/ForestedMinimal.h"
 #include "AlphaBlend.h"
 #include "Engine/AssetManager.h"
 #include "Kismet/BlueprintFunctionLibrary.h"

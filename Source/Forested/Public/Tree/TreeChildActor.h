@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Forested/ForestedMinimal.h"
 #include "TreeChildComponent.h"
 #include "Sky.h"
 #include "GameFramework/Actor.h"

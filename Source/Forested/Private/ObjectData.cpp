@@ -1,5 +1,4 @@
 #include "ObjectData.h"
-#include "Forested/Forested.h"
 
 FObjectData::FObjectData(const UObject* Object) {
 	if (!IsValid(Object)) {

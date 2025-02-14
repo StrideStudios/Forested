@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Forested/ForestedMinimal.h"
 #include "PlayerInventoryActor.h"
 #include "ThrowableInventoryRenderActor.generated.h"
 

@@ -1,8 +1,9 @@
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Forested/ForestedMinimal.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/PlayerController.h"
 #include "Kismet/BlueprintAsyncActionBase.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "FPlayer.generated.h"

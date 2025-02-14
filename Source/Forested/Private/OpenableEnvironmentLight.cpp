@@ -3,7 +3,6 @@
 #include "Components/LightComponent.h"
 #include "Components/PointLightComponent.h"
 #include "Components/RectLightComponent.h"
-#include "Forested/Forested.h"
 
 template <typename Pred>
 void FOpenableLightBase::Refresh(ULightComponent* LightComponent, AOpenableActor* OpenableActor, const bool bIsActiveOnOpen, Pred&& RefreshParent) {

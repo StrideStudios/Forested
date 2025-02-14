@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Forested/ForestedMinimal.h"
 #include "UObject/Interface.h"
 #include "LoadableInterface.generated.h"
 

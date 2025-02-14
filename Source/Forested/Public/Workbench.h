@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Forested/ForestedMinimal.h"
 #include "SelectableInterface.h"
 #include "Item/Item.h"
 #include "Item/InventoryActor.h"
