@@ -6,7 +6,8 @@
 #include "Tree/TreeActor.h"
 #include "Tree/TreeSplitActor.h"
 #include "FPlayer.h"
-#include "Components/HierarchicalInstancedStaticMeshComponent.h"
+#include "Sky.h"
+#include "Tree/TreeChildComponent.h"
 #include "Tree/TreeSubsystem.h"
 
 //tree mesh seems to be too large, could be because beginplay?

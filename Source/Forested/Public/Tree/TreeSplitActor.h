@@ -5,10 +5,10 @@
 #include "DamageableInterface.h"
 #include "LoadableInterface.h"
 #include "ObjectSaveGame.h"
-#include "TreeChildComponent.h"
-#include "Item/Item.h"
 #include "TreeSplitActor.generated.h"
 
+class UTreeItem;
+class UTrunkComponent;
 class UBoxComponent;
 class AFPlayer;
 class UObjectSaveGame;

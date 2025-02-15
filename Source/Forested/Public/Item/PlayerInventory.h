@@ -1,10 +1,7 @@
 #pragma once
 
 #include "Forested/ForestedMinimal.h"
-#include "Item.h"
-#include "Inventory.h"
 #include "InventoryComponent.h"
-#include "PlayerInventoryActor.h"
 #include "Animation/AnimInstance.h"
 #include "Forested/ForestedGameMode.h"
 #include "PlayerInventory.generated.h"

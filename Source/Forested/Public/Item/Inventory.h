@@ -3,7 +3,6 @@
 #include "Forested/ForestedMinimal.h"
 #include "Item.h"
 #include "ObjectSaveGame.h"
-#include "SelectableInterface.h"
 #include "Inventory.generated.h"
 
 UINTERFACE(MinimalAPI, meta = (CannotImplementInterfaceInBlueprint))

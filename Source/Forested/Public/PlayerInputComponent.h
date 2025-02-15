@@ -3,7 +3,6 @@
 #include "Forested/ForestedMinimal.h"
 #include "EnhancedInputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "PhysicalMaterials/PhysicalMaterial.h"
 #include "PlayerInputComponent.generated.h"
 
 class AWaterActor;

@@ -1,11 +1,12 @@
 #pragma once
 
+#include "ObjectData.h"
 #include "Forested/ForestedMinimal.h"
-#include "TreeChildComponent.h"
-#include "Sky.h"
 #include "GameFramework/Actor.h"
 #include "TreeChildActor.generated.h"
 
+class UItem;
+class UTreeChildComponent;
 class UCapsuleComponent;
 class AFPlayer;
 

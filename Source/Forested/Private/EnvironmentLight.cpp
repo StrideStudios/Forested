@@ -1,11 +1,11 @@
 #include "EnvironmentLight.h"
-
 #include "Sky.h"
 #include "Components/ArrowComponent.h"
 #include "Components/PointLightComponent.h" 
 #include "Components/RectLightComponent.h" 
 #include "Components/SkyAtmosphereComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 AEnvironmentLight::AEnvironmentLight() {

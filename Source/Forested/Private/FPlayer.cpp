@@ -1,5 +1,4 @@
 #include "FPlayer.h"
-
 #include "EngineUtils.h"
 #include "GameFramework/PlayerController.h" 
 #include "Item/PlayerInventory.h"
@@ -11,6 +10,7 @@
 #include "PlayerInputComponent.h"
 #include "PlayerWidget.h"
 #include "SelectableInterface.h"
+#include "SerializationLibrary.h"
 #include "Sky.h"
 #include "ViewmodelMeshes.h"
 #include "Components/SphereComponent.h"
@@ -118,6 +118,10 @@ void AFPlayer::Tick(const float DeltaTime){
 
 UInputComponent* AFPlayer::CreatePlayerInputComponent() {
 	return PlayerInputComponent;
+}
+
+APlayerController* AFPlayer::GetPlayerController() const {
+	return CastChecked<APlayerController>(GetController());
 }
 
 bool AFPlayer::GetPlayerAnimInstance(UPlayerAnimInstance*& OutAnimInstance) const {

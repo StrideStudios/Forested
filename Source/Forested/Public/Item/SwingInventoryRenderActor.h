@@ -2,10 +2,10 @@
 
 #include "Forested/ForestedMinimal.h"
 #include "AlphaBlend.h"
-#include "DamageableInterface.h"
 #include "PlayerInventoryActor.h"
 #include "SwingInventoryRenderActor.generated.h"
 
+enum class EDamageType : uint8;
 class UNiagaraComponent;
 class UCameraShakeBase;
 class UNiagaraSystem;
@@ -59,7 +59,7 @@ public:
 private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Damage")
-	EDamageType DamageType = EDamageType::Axe;
+	EDamageType DamageType;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Damage")
 	float Damage = 15.f;

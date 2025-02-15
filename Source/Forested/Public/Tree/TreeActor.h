@@ -5,13 +5,14 @@
 #include "SelectableInterface.h"
 #include "DamageableInterface.h"
 #include "LoadableInterface.h"
-#include "TreeChildActor.h"
+#include "ObjectSaveGame.h"
 #include "TreeActor.generated.h"
 
+class ATreeChildActor;
 class AFPlayer;
 
 UCLASS(BlueprintType, meta = (PrioritizeCategories = "Tree Mesh"))
-class FORESTED_API ATreeActor : public AActor, public ILoadableInterface , public IDamageableInterface, public ISelectableInterface, public ISaveActorInterface{
+class FORESTED_API ATreeActor : public AActor, public ILoadableInterface , public IDamageableInterface, public ISelectableInterface, public ISaveActorInterface {
 	GENERATED_BODY()
 	
 public:	
@@ -29,16 +30,16 @@ public:
 	FORCEINLINE float GetHealth() const { return Health; }
 
 	UFUNCTION(BlueprintCallable, Category = "Tree Actor")
-	FORCEINLINE bool HasTreeChildActor() const { return IsValid(GetTreeChildActor()); }
+	bool HasTreeChildActor() const;
 	
 	UFUNCTION(BlueprintCallable, Category = "Tree Actor")
-	FORCEINLINE ATreeChildActor* GetTreeChildActor() const { return TreeChildActor; }
+	ATreeChildActor* GetTreeChildActor() const;
 	
 	UFUNCTION(BlueprintCallable, Category = "Tree Actor")
-	FORCEINLINE bool IsStump() const { return !HasTreeChildActor() && TreeChildActorClass; }
+	bool IsStump() const;
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Tree Actor")
-	FORCEINLINE bool IsSunk() const { return !TreeChildActorComponent->GetChildActor() && !TreeChildActorClass; }
+	bool IsSunk() const;
 	
 	virtual void Damage_Implementation(AFPlayer* Player, const FHitResult& HitResult, float Damage, EDamageType DamageType) override;
 

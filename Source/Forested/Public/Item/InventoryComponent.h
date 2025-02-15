@@ -3,7 +3,6 @@
 #include "Forested/ForestedMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Inventory.h"
-#include "ObjectSaveGame.h"
 #include "InventoryComponent.generated.h"
 
 UCLASS(meta = (PrioritizeCategories = "Inventory"))

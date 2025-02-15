@@ -1,5 +1,4 @@
 #include "FireActor.h"
-
 #include "FPlayer.h"
 #include "Item/PlayerInventory.h"
 

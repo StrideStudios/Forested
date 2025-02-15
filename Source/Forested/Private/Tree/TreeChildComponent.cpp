@@ -2,10 +2,10 @@
 #include "CullStaticMeshComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "SerializationLibrary.h"
+#include "Sky.h"
 #include "Item/ItemActor.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
-#include "Tree/TreeChildActor.h"
 
 void UTreeChildComponent::BeginPlay() {
 	Super::BeginPlay();

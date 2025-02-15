@@ -1,12 +1,13 @@
 #include "Tree/TreeActor.h"
 #include "Kismet/GameplayStatics.h"
-#include "Kismet/KismetMathLibrary.h" 
 #include "Components/WidgetComponent.h"
 #include "FPlayer.h"
+#include "SerializationLibrary.h"
 #include "Engine/AssetManager.h"
 #include "Item/ItemActor.h"
 #include "Item/PlayerInventory.h"
 #include "Item/SeedItem.h"
+#include "Tree/TreeChildActor.h"
 #include "Tree/TreeSubsystem.h"
 
 ATreeActor::ATreeActor(){
@@ -38,6 +39,22 @@ void ATreeActor::BeginPlay() {
 	Super::BeginPlay();
 	SetPosition = GetActorLocation();
 	TREE_SUBSYSTEM->AddTree(this);
+}
+
+bool ATreeActor::HasTreeChildActor() const {
+	return IsValid(GetTreeChildActor());
+}
+
+ATreeChildActor* ATreeActor::GetTreeChildActor() const {
+	return TreeChildActor;
+}
+
+bool ATreeActor::IsStump() const {
+	return !HasTreeChildActor() && TreeChildActorClass;
+}
+
+bool ATreeActor::IsSunk() const {
+	return !TreeChildActorComponent->GetChildActor() && !TreeChildActorClass;
 }
 
 void ATreeActor::Damage_Implementation(AFPlayer* Player, const FHitResult& HitResult, const float Damage, const EDamageType DamageType) {

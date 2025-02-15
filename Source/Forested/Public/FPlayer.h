@@ -2,8 +2,6 @@
 
 #include "Forested/ForestedMinimal.h"
 #include "GameFramework/Character.h"
-#include "GameFramework/CharacterMovementComponent.h"
-#include "GameFramework/PlayerController.h"
 #include "Kismet/BlueprintAsyncActionBase.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "FPlayer.generated.h"
@@ -11,12 +9,11 @@
 class UWidget;
 class UPlayerHud;
 class UPlayerAnimInstance;
-class UPawnWaterComponent;
 class UPlayerInputComponent;
 class USphereComponent;
 class UCameraComponent;
 
-DECLARE_DELEGATE_OneParam(FInterpolatePlayerDelegate, class AFPlayer*);
+DECLARE_DELEGATE_OneParam(FInterpolatePlayerDelegate, AFPlayer*);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInterpolatePlayerDynamicDelegate, AFPlayer*, Player);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnHealthUpdate, float, Health, float, Damage);
@@ -55,7 +52,7 @@ public:
 	bool HandleMenuPressed();
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Player")
-	FORCEINLINE APlayerController* GetPlayerController() const { return CastChecked<APlayerController>(GetController()); }
+	APlayerController* GetPlayerController() const;
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Player")
 	FORCEINLINE bool IsGameStarted() const { return bIsGameStarted; }

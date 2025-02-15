@@ -3,7 +3,6 @@
 #include "Forested/ForestedMinimal.h"
 #include "ObjectSaveGame.h"
 #include "GameFramework/Actor.h"
-#include "Kismet/KismetMathLibrary.h"
 #include "Components/DirectionalLightComponent.h" 
 #include "Kismet/BlueprintAsyncActionBase.h"
 #include "Sky.generated.h"
@@ -70,27 +69,17 @@ public:
 		return "Sky";
 	}
 
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Sky")
-	FORCEINLINE UMaterialParameterCollection* GetSkyCollection() const { return SkyCollection; }
-
 	/**
 	* 0-0.25 is spring, 0.25-0.5 is summer, 0.5-0.75 is fall, 0.75-1 is winter
 	* assume season from day + time; spring starts on March 19, 20, or 21 (78/79/80); summer starts on June 20 or 21 (171/172); fall starts on September 22 or 23 (265/266); winter starts on December 21 or 22 (355/356);  (roughly 90 days per season)
 	* TODO: leap years
 	**/
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Sky")
-	FORCEINLINE	float GetSeasonTime() const {
-		if (Day >= 78 && Day <= 170)
-			return UKismetMathLibrary::MapRangeClamped(Day + Time, 78.f, 171.f, 0.f, 0.25f);//0.5f,0.f
-		if (Day >= 171 && Day <= 264)
-			return UKismetMathLibrary::MapRangeClamped(Day + Time, 171.f, 265.f, 0.25f, 0.5f);//0.f,0.5f
-		if (Day >= 265 && Day <= 354)
-			return UKismetMathLibrary::MapRangeClamped(Day + Time, 265.f, 355.f, 0.5f, 0.75f);//0.5f,1.f
-		if (Day >= 355 || Day <= 77)
-			return UKismetMathLibrary::MapRangeClamped(Day >= 0 && Day <= 77 ? 366 + Day + Time : Day + Time, 355.f, 444.f, 0.75f, 1.f);//1.f,0.5f
-		return 0.f;
-	}
+	float GetSeasonTime() const;
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Sky")
+	FORCEINLINE UMaterialParameterCollection* GetSkyCollection() const { return SkyCollection; }
+	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Sky")
 	FORCEINLINE ESeason GetSeason() const {
 		return ESeason::Summer; //TODO: static_cast<ESeason>(GetSeasonTime() * 4.f);

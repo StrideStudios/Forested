@@ -1,8 +1,6 @@
 #pragma once
 
 #include "Forested/ForestedMinimal.h"
-#include "SelectableInterface.h"
-#include "Item/Item.h"
 #include "Item/InventoryActor.h"
 #include "Item/RenderActor.h"
 #include "Workbench.generated.h"

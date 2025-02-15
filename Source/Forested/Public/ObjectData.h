@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Forested/ForestedMinimal.h"
-#include "Engine/StreamableManager.h"
 #include "Serialization/ObjectAndNameAsStringProxyArchive.h"
 #include "ObjectData.generated.h"
 

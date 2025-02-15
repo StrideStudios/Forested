@@ -2,7 +2,6 @@
 
 #include "Forested/ForestedMinimal.h"
 #include "Item.h"
-#include "Tree/TreeChildActor.h"
 #include "SeedItem.generated.h"
 
 UCLASS()
@@ -19,6 +18,6 @@ public:
 	}
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TSoftClassPtr<ATreeChildActor> TreeClass;
+	TSoftClassPtr<class ATreeChildActor> TreeClass;
 	
 };

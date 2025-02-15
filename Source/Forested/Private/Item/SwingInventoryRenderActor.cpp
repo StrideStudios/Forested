@@ -1,4 +1,5 @@
 #include "Item/SwingInventoryRenderActor.h"
+#include "DamageableInterface.h"
 #include "FPlayer.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
@@ -9,6 +10,7 @@
 
 ASwingInventoryRenderActor::ASwingInventoryRenderActor() {
 	PrimaryActorTick.bCanEverTick = false;
+	DamageType = EDamageType::Axe;
 	
 	StartTraceMovement = CreateDefaultSubobject<USceneComponent>(TEXT("Start Trace Movement"));
 	StartTraceMovement->SetupAttachment(GetRootComponent());

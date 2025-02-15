@@ -11,6 +11,7 @@
 #include "Tree/TreeActor.h"
 #include "SerializationLibrary.h"
 #include "ViewmodelMeshes.h"
+#include "Item/PlayerInventoryActor.h"
 
 UPlayerInventory::UPlayerInventory() {
 	PrimaryComponentTick.bCanEverTick = true;

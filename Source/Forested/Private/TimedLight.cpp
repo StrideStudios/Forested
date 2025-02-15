@@ -1,13 +1,10 @@
 #include "TimedLight.h"
-
 #include "Sky.h"
-#include "Components/ArrowComponent.h"
 #include "Components/PointLightComponent.h" 
 #include "Components/RectLightComponent.h" 
 #include "Components/SkyAtmosphereComponent.h"
 #include "Components/SpotLightComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "Kismet/KismetSystemLibrary.h"
 
 ATimedLight::ATimedLight() {
 	PrimaryActorTick.bCanEverTick = false;

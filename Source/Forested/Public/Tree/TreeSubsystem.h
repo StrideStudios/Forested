@@ -1,7 +1,6 @@
 #pragma once
 
 #include "DamageableInterface.h"
-#include "TreeActor.h"
 #include "Subsystems/WorldSubsystem.h"
 #include "TreeSubsystem.generated.h"
 

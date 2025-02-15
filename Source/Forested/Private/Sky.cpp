@@ -64,6 +64,18 @@ void ASky::EndPlay(const EEndPlayReason::Type EndPlayReason) {
 	TimedEvents.Empty();
 }
 
+float ASky::GetSeasonTime() const {
+	if (Day >= 78 && Day <= 170)
+		return UKismetMathLibrary::MapRangeClamped(Day + Time, 78.f, 171.f, 0.f, 0.25f);//0.5f,0.f
+	if (Day >= 171 && Day <= 264)
+		return UKismetMathLibrary::MapRangeClamped(Day + Time, 171.f, 265.f, 0.25f, 0.5f);//0.f,0.5f
+	if (Day >= 265 && Day <= 354)
+		return UKismetMathLibrary::MapRangeClamped(Day + Time, 265.f, 355.f, 0.5f, 0.75f);//0.5f,1.f
+	if (Day >= 355 || Day <= 77)
+		return UKismetMathLibrary::MapRangeClamped(Day >= 0 && Day <= 77 ? 366 + Day + Time : Day + Time, 355.f, 444.f, 0.75f, 1.f);//1.f,0.5f
+	return 0.f;
+}
+
 void ASky::Tick(const float DeltaTime){
 	Super::Tick(DeltaTime);
 	if (!PLAYER || !PLAYER->IsGameStarted()) return;

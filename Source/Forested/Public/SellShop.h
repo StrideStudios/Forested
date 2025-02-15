@@ -2,7 +2,6 @@
 
 #include "Forested/ForestedMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Item/Item.h"
 #include "SellShop.generated.h"
 
 class UBoxComponent;

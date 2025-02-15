@@ -2,7 +2,6 @@
 
 #include "Forested/ForestedMinimal.h"
 #include "AlphaBlend.h"
-#include "Engine/AssetManager.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "ForestedLibrary.generated.h"

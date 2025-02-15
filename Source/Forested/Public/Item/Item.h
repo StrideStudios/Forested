@@ -200,7 +200,7 @@ public:
 
 private:
 
-	UPROPERTY(EditDefaultsOnly, Instanced) //TODO: Instanced wasnt needed in ue5, should find out why
+	UPROPERTY(EditDefaultsOnly, Instanced)
 	TArray<UItem*> Items = {};
 
 	UPROPERTY(SaveGame)

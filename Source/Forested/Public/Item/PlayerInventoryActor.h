@@ -1,16 +1,14 @@
 #pragma once
 
 #include "Forested/ForestedMinimal.h"
-#include "Item.h"
-#include "RenderActor.h"
-#include "SerializationLibrary.h"
-#include "Animation/BlendSpace1D.h"
+#include "GameFramework/Actor.h"
 #include "PlayerInventoryActor.generated.h"
 
+class UBlendSpace1D;
+struct FItemHeap;
 struct FAlphaBlend;
 class UViewmodelStaticMeshComponent;
 class UPlayerAnimInstance;
-class UPlayerInventory;
 
 /*
  *	Used to define logic for rendering an item in inventory

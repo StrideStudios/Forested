@@ -4,10 +4,8 @@
 #include "CullStaticMeshComponent.h"
 #include "Item/Item.h"
 #include "Item/ItemActor.h"
-#include "Item/PlayerInventory.h"
 #include "TreeChildComponent.generated.h"
 
-class AItemActor;
 class UNiagaraSystem;
 
 UCLASS()

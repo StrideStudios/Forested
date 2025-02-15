@@ -3,7 +3,6 @@
 #include "Forested/ForestedMinimal.h"
 #include "PlayerWidget.h"
 #include "SelectableInterface.h"
-#include "Blueprint/UserWidget.h"
 #include "GameFramework/Actor.h"
 #include "Mailbox.generated.h"
 
