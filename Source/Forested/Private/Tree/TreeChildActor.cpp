@@ -5,9 +5,9 @@
 #include "Components/CapsuleComponent.h" 
 #include "Tree/TreeActor.h"
 #include "Tree/TreeSplitActor.h"
-#include "LevelDefaults.h"
 #include "FPlayer.h"
 #include "Components/HierarchicalInstancedStaticMeshComponent.h"
+#include "Tree/TreeSubsystem.h"
 
 //tree mesh seems to be too large, could be because beginplay?
 ATreeChildActor::ATreeChildActor() {

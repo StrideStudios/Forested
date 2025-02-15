@@ -4,6 +4,8 @@
 #include "Subsystems/WorldSubsystem.h"
 #include "UnderwaterSubsystem.generated.h"
 
+#define UNDERWATER_SUBSYSTEM GetWorld()->GetSubsystem<UUnderwaterSubsystem>()
+
 class AWaterActor;
 
 struct FUnderwaterPostProcessVolume final : IInterface_PostProcessVolume {

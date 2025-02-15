@@ -5,7 +5,6 @@
 #include "Components/ArrowComponent.h" 
 #include "Kismet/GameplayStatics.h"
 #include "Curves/CurveLinearColor.h" 
-#include "LevelDefaults.h"
 #include "Components/ExponentialHeightFogComponent.h"
 #include "Components/SkyAtmosphereComponent.h"
 #include "Components/SkyLightComponent.h"

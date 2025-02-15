@@ -1,5 +1,4 @@
 #include "SplineRenderComponent.h"
-#include "LevelDefaults.h"
 #include "Components/SplineMeshComponent.h"
 
 USplineRenderComponent::USplineRenderComponent() {

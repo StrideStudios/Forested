@@ -1,6 +1,5 @@
 #include "TimedLight.h"
 
-#include "LevelDefaults.h"
 #include "Sky.h"
 #include "Components/ArrowComponent.h"
 #include "Components/PointLightComponent.h" 

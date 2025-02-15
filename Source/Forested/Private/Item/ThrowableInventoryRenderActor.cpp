@@ -1,6 +1,5 @@
 #include "Item/ThrowableInventoryRenderActor.h"
 #include "FPlayer.h"
-#include "LevelDefaults.h"
 #include "SplineRenderComponent.h"
 #include "ViewmodelMeshes.h"
 #include "Camera/CameraComponent.h"

@@ -14,7 +14,6 @@ class UCurveFloat;
 class UDirectionalLightComponent;
 class UVolumetricCloudComponent;
 class UArrowComponent;
-class UObjectSaveGame;
 
 DECLARE_DELEGATE_TwoParams(FTimedEventDelegate, float, float);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FTimedEventDynamicDelegate, float, TimeInSeconds, float, ExecuteTime);

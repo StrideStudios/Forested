@@ -3,17 +3,23 @@
 #include "Sky.h"
 #include "Forested/ForestedGameMode.h"
 #include "Kismet/GameplayStatics.h"
+#include "Forested/ForestedMinimal.h"
 
 AForestedGameMode* ULevelDefaults::ForestedGameMode = nullptr;
 AFPlayer* ULevelDefaults::Player = nullptr;
 ASky* ULevelDefaults::Sky = nullptr;
 
+template <class UserClass>
+UserClass* GetActor(UObject* WorldContextObject) {
+	if (!WorldContextObject) return nullptr;
+	LOG_WARNING("Attempted to get actor from world in level defaults for actor class %s", *UserClass::StaticClass()->GetName());
+	return Cast<UserClass>(UGameplayStatics::GetActorOfClass(WorldContextObject, UserClass::StaticClass()));
+}
+
 void ULevelDefaults::StartPlay(const UWorld* World, AForestedGameMode* InForestedGameMode) {
 	ForestedGameMode = InForestedGameMode;
-	if (AFPlayer* InPlayer = CastChecked<AFPlayer>(UGameplayStatics::GetPlayerCharacter(World, 0)))
-		Player = InPlayer;
-	if (ASky* InSky = CastChecked<ASky>(UGameplayStatics::GetActorOfClass(World, ASky::StaticClass())))
-		Sky = InSky;
+	Player = Cast<AFPlayer>(UGameplayStatics::GetPlayerCharacter(World, 0));
+	Sky = Cast<ASky>(UGameplayStatics::GetActorOfClass(World, ASky::StaticClass()));
 }
 
 void ULevelDefaults::EndPlay() {

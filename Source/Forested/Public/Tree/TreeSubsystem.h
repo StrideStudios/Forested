@@ -5,10 +5,11 @@
 #include "Subsystems/WorldSubsystem.h"
 #include "TreeSubsystem.generated.h"
 
+#define TREE_SUBSYSTEM GetWorld()->GetSubsystem<UTreeSubsystem>()
+
 class ATreeChildActor;
 class ATreeActor;
 class UHierarchicalInstancedStaticMeshComponent;
-class ATreeInstanceManager;
 
 UCLASS(NotPlaceable, Abstract) //Hidden dont work lol
 class FORESTED_API AInstanceActorBase : public AActor, public IDamageableInterface {

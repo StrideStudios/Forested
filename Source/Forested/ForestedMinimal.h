@@ -1,14 +1,11 @@
 #pragma once
 
-/*
- * Base Includes
- */
-
 #include "CoreMinimal.h"
 #include "Forested.h"
+#include "LevelDefaults.h"
 
 /*
- * Base Macros
+ * Test Macros
  */
 
 //is in world
@@ -24,6 +21,10 @@
 //is playing game standalone (not in editor) with world parameter
 #define TEST_PLAYING(World, InWorldType) (World && World->WorldType == InWorldType)
 
+/*
+ * Channel Macros
+ */
+
 #define LANDSCAPE_OBJECT_CHANNEL ECollisionChannel::ECC_GameTraceChannel1
 #define TREE_ACTOR_OBJECT_CHANNEL ECollisionChannel::ECC_GameTraceChannel2
 #define WATER_OBJECT_CHANNEL ECollisionChannel::ECC_GameTraceChannel3
@@ -33,7 +34,9 @@
 #define HOVER_TRACE_CHANNEL ECollisionChannel::ECC_GameTraceChannel7
 #define SELECT_TRACE_CHANNEL ECollisionChannel::ECC_GameTraceChannel8
 
-//macros used to define basic logging behavior with varying parameters
+/*
+ * Print Macros
+ */
 
 #define PRINT_1(x) PRINT_2(x, 2.f)
 #define PRINT_2(x, TimeToDisplay) PRINT_3(x, TimeToDisplay, -1)
@@ -51,6 +54,10 @@
 
 //macro to print an empty line
 #define PRINT_EMPTY PRINT("")
+
+/*
+ * Logging Macros
+ */
 
 //macro used to put messages in the output log
 #define LOG(x, ...) \
@@ -72,7 +79,6 @@
 #else
 #define LOG_EDITOR(x, ...)
 #endif
-
 
 //macro used to put warnings in the output log (only outputs in editor)
 #if WITH_EDITOR

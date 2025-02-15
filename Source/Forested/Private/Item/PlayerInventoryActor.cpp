@@ -1,6 +1,5 @@
 #include "Item/PlayerInventoryActor.h"
 #include "FPlayer.h"
-#include "LevelDefaults.h"
 #include "ViewmodelMeshes.h"
 #include "Item/PlayerInventory.h"
 
