@@ -15,26 +15,14 @@ void USplineRenderComponent::RefreshSplineComponent() {
 
 	AActor* Outer = GetOwner();
 	if (!Outer || !IN_WORLD) return;
-	
-	while (SplineComponents.Num() != GetNumberOfSplineComponents()) {
-		if (SplineComponents.Num() > GetNumberOfSplineComponents()) {
-			const int i = SplineComponents.Num() - 1;
-			USplineMeshComponent* SplinePointMesh = SplineComponents[i];//array out of bounds -1 into an array of size 0 (?)
-			SplineComponents.RemoveAt(i);
-			SplinePointMesh->DestroyComponent();
-		} else if (SplineComponents.Num() < GetNumberOfSplineComponents()) {
-			const int i = SplineComponents.Num();
-			FString Name = FString::Printf(TEXT("SplineMeshComponent_%d"), i);
-			USplineMeshComponent* SplinePointMesh = NewObject<USplineMeshComponent>(Outer, GetSplineClass(), *Name, RF_Transactional);
-			SplinePointMesh->bSelectable = false;
-			check(SplinePointMesh);
-			SplineComponents.Add(SplinePointMesh);
-		}
-	}
 
-	for (int32 i = 0; i < SplineComponents.Num(); ++i) {
-		USplineMeshComponent* SplinePointMesh = SplineComponents[i];
-		if (!SplinePointMesh) continue;
+	for (int32 i = 0; i < GetNumberOfSplineComponents(); ++i) {
+		FString Name = FString::Printf(TEXT("SplineMeshComponent_%d"), i);
+		USplineMeshComponent* SplinePointMesh = NewObject<USplineMeshComponent>(Outer, GetSplineClass(), *Name, RF_Transactional);
+		SplinePointMesh->bSelectable = false;
+		check(SplinePointMesh);
+		SplineComponents.Add(SplinePointMesh);
+		SplinePointMesh->RegisterComponent();
 		InitComponent(SplinePointMesh, i);
 		UpdateSplineComponent(SplinePointMesh, i);
 	}
@@ -71,7 +59,7 @@ void USplineRenderComponent::UpdateSplineComponent(USplineMeshComponent* SplineP
 
 void USplineRenderComponent::ClearComponents() {
 	for (const auto& Component : SplineComponents) {
-		if (!IsValid(Component)) continue;
+		if (!Component) continue;
 		Component->DestroyComponent();
 	}
 	SplineComponents.Empty();
@@ -84,7 +72,7 @@ void USplineRenderComponent::OnRegister() {
 
 void USplineRenderComponent::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
-	RefreshSplineComponent();
+	//RefreshSplineComponent();
 }
 
 void USplineRenderComponent::DestroyComponent(const bool bPromoteChildren) {

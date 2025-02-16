@@ -69,6 +69,7 @@ void AWaterActor::Tick(const float DeltaSeconds) {
 void AWaterActor::OnConstruction(const FTransform& Transform) {
 	Super::OnConstruction(Transform);
 	SetActorRotation(FRotator(0.0));
+	SplineComponent->RefreshSplineComponent();
 }
 
 float AWaterActor::GetRiverAmountAtInputKey(const float InputKey) const {

@@ -20,6 +20,9 @@ public:
 	virtual void BeginPlay() override;
 
 	UFUNCTION(BlueprintCallable, Category = "Spline Render Component")
+	TArray<USplineMeshComponent*> GetSplineComponents() const { return SplineComponents; }
+	
+	UFUNCTION(BlueprintCallable, Category = "Spline Render Component")
 	virtual void RefreshSplineComponent();
 
 	UFUNCTION(BlueprintCallable, Category = "Spline Render Component")
