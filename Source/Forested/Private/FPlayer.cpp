@@ -17,6 +17,8 @@
 #include "Engine/GameViewportClient.h"
 #include "Kismet/KismetMathLibrary.h"
 
+//TODO: move stuff out of here because too much
+
 AFPlayer::AFPlayer(const FObjectInitializer& ObjectInitializer) :
 Super(ObjectInitializer.SetDefaultSubobjectClass<UPlayerMovementComponent>(CharacterMovementComponentName).SetDefaultSubobjectClass<UViewmodelSkeletalMeshComponent>(MeshComponentName)){
 	PrimaryActorTick.bCanEverTick = true;
