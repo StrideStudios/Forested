@@ -1,6 +1,6 @@
 #include "FireActor.h"
-#include "FPlayer.h"
-#include "Item/PlayerInventory.h"
+#include "Player/FPlayer.h"
+#include "Player/PlayerInventory.h"
 
 AFireActor::AFireActor() {
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ObjectData.h"
+#include "Serialization/ObjectData.h"
 #include "Forested/ForestedMinimal.h"
 #include "GameFramework/Actor.h"
 #include "TreeChildActor.generated.h"

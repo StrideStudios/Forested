@@ -1,8 +1,8 @@
 #include "ForestedGameMode.h"
 
 #include "EngineUtils.h"
-#include "FPlayer.h"
-#include "ObjectSaveGame.h"
+#include "Player/FPlayer.h"
+#include "Serialization/ObjectSaveGame.h"
 #include "GameFramework/GameStateBase.h"
 #include "GameFramework/PlayerInput.h"
 #include "Kismet/GameplayStatics.h"

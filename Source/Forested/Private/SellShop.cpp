@@ -1,9 +1,10 @@
 #include "SellShop.h"
 #include "Kismet/GameplayStatics.h"
-#include "FPlayer.h"
+#include "Player/FPlayer.h"
 #include "Components/BoxComponent.h"
 #include "Sky.h"
-#include "Item/ItemActor.h"
+#include "Items/Item.h"
+#include "Items/ItemActor.h"
 
 ASellShop::ASellShop() {
 	PrimaryActorTick.bCanEverTick = false;

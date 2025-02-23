@@ -1,9 +1,9 @@
 #pragma once
 
 #include "Forested/ForestedMinimal.h"
-#include "CullStaticMeshComponent.h"
-#include "Item/Item.h"
-#include "Item/ItemActor.h"
+#include "Components/CullStaticMeshComponent.h"
+#include "Items/Item.h"
+#include "Items/ItemActor.h"
 #include "TreeChildComponent.generated.h"
 
 class UNiagaraSystem;

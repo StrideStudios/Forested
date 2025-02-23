@@ -2,7 +2,7 @@
 
 #include "Forested/ForestedMinimal.h"
 #include "GameFramework/Actor.h"
-#include "SelectableInterface.h"
+#include "Interfaces/SelectableInterface.h"
 #include "FireActor.generated.h"
 
 UCLASS()

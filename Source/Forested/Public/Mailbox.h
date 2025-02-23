@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Forested/ForestedMinimal.h"
-#include "PlayerWidget.h"
-#include "SelectableInterface.h"
+#include "Widget/PlayerWidget.h"
+#include "Interfaces/SelectableInterface.h"
 #include "GameFramework/Actor.h"
 #include "Mailbox.generated.h"
 

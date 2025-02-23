@@ -1,6 +1,6 @@
 #include "Mailbox.h"
-#include "FPlayer.h"
-#include "PlayerWidget.h"
+#include "Player/FPlayer.h"
+#include "Widget/PlayerWidget.h"
 #include "Components/BoxComponent.h"
 
 AMailbox::AMailbox() {

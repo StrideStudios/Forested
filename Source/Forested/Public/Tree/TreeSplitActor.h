@@ -2,9 +2,9 @@
 
 #include "Forested/ForestedMinimal.h"
 #include "GameFramework/Actor.h"
-#include "DamageableInterface.h"
-#include "LoadableInterface.h"
-#include "ObjectSaveGame.h"
+#include "Interfaces/DamageableInterface.h"
+#include "Interfaces/LoadableInterface.h"
+#include "Serialization/ObjectSaveGame.h"
 #include "TreeSplitActor.generated.h"
 
 class UTreeItem;

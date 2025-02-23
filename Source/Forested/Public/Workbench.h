@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Forested/ForestedMinimal.h"
-#include "Item/InventoryActor.h"
-#include "Item/RenderActor.h"
+#include "Items/InventoryActor.h"
+#include "Items/RenderActor.h"
 #include "Workbench.generated.h"
 
 class AWorkbench;

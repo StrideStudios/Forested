@@ -2,10 +2,10 @@
 
 #include "Forested/ForestedMinimal.h"
 #include "GameFramework/Actor.h"
-#include "SelectableInterface.h"
-#include "DamageableInterface.h"
-#include "LoadableInterface.h"
-#include "ObjectSaveGame.h"
+#include "Interfaces/SelectableInterface.h"
+#include "Interfaces/DamageableInterface.h"
+#include "Interfaces/LoadableInterface.h"
+#include "Serialization/ObjectSaveGame.h"
 #include "TreeActor.generated.h"
 
 class ATreeChildActor;

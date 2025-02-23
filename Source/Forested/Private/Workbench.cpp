@@ -1,7 +1,8 @@
 #include "Workbench.h"
-#include "FPlayer.h"
+#include "Player/FPlayer.h"
 #include "Components/BoxComponent.h"
-#include "Item/PlayerInventory.h"
+#include "Player/PlayerInventory.h"
+#include "Serialization/SerializationLibrary.h"
 
 AWorkbenchRenderActor::AWorkbenchRenderActor() {
 	PrimaryActorTick.bCanEverTick = false;

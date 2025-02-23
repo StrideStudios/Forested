@@ -1,9 +1,9 @@
 #include "Tree/TreeChildComponent.h"
-#include "CullStaticMeshComponent.h"
+#include "Components/CullStaticMeshComponent.h"
 #include "NiagaraFunctionLibrary.h"
-#include "SerializationLibrary.h"
+#include "Serialization/SerializationLibrary.h"
 #include "Sky.h"
-#include "Item/ItemActor.h"
+#include "Items/ItemActor.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Forested/ForestedMinimal.h"
-#include "ObjectSaveGame.h"
+#include "Serialization/ObjectSaveGame.h"
 #include "GameFramework/Actor.h"
 #include "Components/DirectionalLightComponent.h" 
 #include "Kismet/BlueprintAsyncActionBase.h"
