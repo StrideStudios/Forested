@@ -1,10 +1,8 @@
 #include "FPlayer.h"
 #include "EngineUtils.h"
-#include "GameFramework/PlayerController.h" 
 #include "Item/PlayerInventory.h"
 #include "Components/CapsuleComponent.h"
 #include "Camera/CameraComponent.h" 
-#include "GameFramework/CharacterMovementComponent.h" 
 #include "Kismet/GameplayStatics.h"
 #include "LoadableInterface.h"
 #include "PlayerInputComponent.h"
@@ -14,13 +12,11 @@
 #include "Sky.h"
 #include "ViewmodelMeshes.h"
 #include "Components/SphereComponent.h"
-#include "Engine/GameViewportClient.h"
-#include "Kismet/KismetMathLibrary.h"
 
-//TODO: move stuff out of here because too much
-
-AFPlayer::AFPlayer(const FObjectInitializer& ObjectInitializer) :
-Super(ObjectInitializer.SetDefaultSubobjectClass<UPlayerMovementComponent>(CharacterMovementComponentName).SetDefaultSubobjectClass<UViewmodelSkeletalMeshComponent>(MeshComponentName)){
+AFPlayer::AFPlayer(const FObjectInitializer& ObjectInitializer): Super(
+	ObjectInitializer.SetDefaultSubobjectClass<UPlayerMovementComponent>(CharacterMovementComponentName)
+	.SetDefaultSubobjectClass<UViewmodelSkeletalMeshComponent>(MeshComponentName)) {
+	
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
 	
@@ -176,7 +172,7 @@ void AFPlayer::SetGameAndUIFocus(UWidget* InWidgetToFocus) const {
 		} else {
 			InputMode.SetWidgetToFocus(Widget);
 		}
-	}//leaf ui doesnt show
+	}
 	PlayerController->SetInputMode(InputMode);
 	PlayerController->FlushPressedKeys();
 	ResetMousePosition();
@@ -190,7 +186,6 @@ void AFPlayer::ResetMousePosition() const {
 	PlayerController->SetMouseLocation(SizeX/2,SizeY/2);
 }
 
-//seems to teleport on first frame
 void AFPlayer::InterpolatePlayerTo_Internal(const FTransform& Transform, float Time, TEnumAsByte<EEasingFunc::Type> EasingFunc, FInterpolatePlayerDelegate OnUpdate, FInterpolatePlayerDelegate OnComplete) {
 	const FVector& OriginalLocation = GetActorLocation();
 	const FRotator& OriginalRotation = GetControlRotation();
