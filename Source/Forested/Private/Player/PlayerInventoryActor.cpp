@@ -35,6 +35,10 @@ void APlayerInventoryActor::Init() {
 	}
 }
 
+void APlayerInventoryActor::Deinit() {
+	ReceiveDeinit();
+}
+
 void APlayerInventoryActor::SetupRootAttachment() const {
 	if (AttachSocket == NAME_None) return;
 	UChildActorComponent* Component = GetParentComponent();
@@ -93,6 +97,10 @@ bool APlayerInventoryActor::StopMontage(const FAlphaBlend& Blend, const UAnimMon
 //TODO: Can switch during montage for some reason
 void APlayerInventoryActor::OnLeftInteract() {
 	ReceiveOnLeftInteract(GetPlayerAnimInstance()->IsAMontageActive());
+}
+
+void APlayerInventoryActor::OnLeftEndInteract() {
+	ReceiveOnLeftEndInteract(GetPlayerAnimInstance()->IsAMontageActive());
 }
 
 void APlayerInventoryActor::OnRightInteract() {

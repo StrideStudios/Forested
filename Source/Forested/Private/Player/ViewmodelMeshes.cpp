@@ -8,7 +8,25 @@
 //https://github.com/tiger-punch-sports-club/ue4-fps-double-camera-separate-fov/blob/master/Source/FovTutorial/DarkMagic/Utils.h
 //Sahil Dhanju
 
-void FViewmodelMeshes::CalculateViewmodelMatrix(const APlayerController* PlayerController, const bool bUseViewmodelFOV, const float ViewmodelFOV, const bool bUseViewmodelScale, const float ViewmodelScale, FMatrix& InOutMatrix) {
+FVector UViewmodelMeshes::CalculateViewmodelLocation(const APlayerController* PlayerController, const FVector& Location, const FViewmodelData& ViewmodelData) {
+	FMatrix Matrix = FTransform(Location).ToMatrixWithScale();
+	CalculateViewmodelMatrix(PlayerController, ViewmodelData, Matrix);
+	return FTransform(Matrix).GetLocation();
+}
+
+FRotator UViewmodelMeshes::CalculateViewmodelRotation(const APlayerController* PlayerController, const FRotator& Rotation, const FViewmodelData& ViewmodelData) {
+	FMatrix Matrix = FTransform(Rotation).ToMatrixWithScale();
+	CalculateViewmodelMatrix(PlayerController, ViewmodelData, Matrix);
+	return FTransform(Matrix).Rotator();
+}
+
+FTransform UViewmodelMeshes::CalculateViewmodelTransform(const APlayerController* PlayerController, const FTransform& Transform, const FViewmodelData& ViewmodelData) {
+	FMatrix Matrix = Transform.ToMatrixWithScale();
+	CalculateViewmodelMatrix(PlayerController, ViewmodelData, Matrix);
+	return FTransform(Matrix);
+}
+
+void UViewmodelMeshes::CalculateViewmodelMatrix(const APlayerController* PlayerController, const FViewmodelData& ViewmodelData, FMatrix& InOutMatrix) {
 	if (!PlayerController) return;
 	const ULocalPlayer* LocalPlayer = Cast<ULocalPlayer>(PlayerController->Player);
 	if (!LocalPlayer || !LocalPlayer->ViewportClient || !LocalPlayer->ViewportClient->Viewport) return;
@@ -24,11 +42,11 @@ void FViewmodelMeshes::CalculateViewmodelMatrix(const APlayerController* PlayerC
 	
 	const double CurrentAspect = ProjectionData.ProjectionMatrix.M[1][1] / ProjectionData.ProjectionMatrix.M[0][0];
 	
-	if (bUseViewmodelFOV) {
+	if (ViewmodelData.bUseViewmodelFOV) {
 
 		const float NearClippingPlaneDistance = ProjectionData.ProjectionMatrix.M[3][2];
 		
-		const double CorrectedFOV = CorrectFOVRad(ViewmodelFOV, TargetAspect, CurrentAspect);
+		const double CorrectedFOV = CorrectFOVRad(ViewmodelData.ViewmodelFOV, TargetAspect, CurrentAspect);
 		
 		PerspectiveAdjustmentMatrix = FMatrix(
 				FPlane(1.0 / CorrectedFOV, 0.0, 0.0, 0.0),
@@ -40,11 +58,11 @@ void FViewmodelMeshes::CalculateViewmodelMatrix(const APlayerController* PlayerC
 
 	FMatrix ViewPerspectiveAdjustmentMatrix = ViewMatrix * PerspectiveAdjustmentMatrix;
 	
-	if (bUseViewmodelScale) {
+	if (ViewmodelData.bUseViewmodelScale) {
 		const FMatrix ScaleAdjustmentMatrix = FMatrix(
-							FPlane(ViewmodelScale, 0.0, 0.0, 0.0),
-							FPlane(0.0, ViewmodelScale, 0.0, 0.0),
-							FPlane(0.0, 0.0, ViewmodelScale, 0.0),
+							FPlane(ViewmodelData.ViewmodelScale, 0.0, 0.0, 0.0),
+							FPlane(0.0, ViewmodelData.ViewmodelScale, 0.0, 0.0),
+							FPlane(0.0, 0.0, ViewmodelData.ViewmodelScale, 0.0),
 							FPlane(0.0, 0.0, 0.0, 1.0));
 
 		ViewPerspectiveAdjustmentMatrix *= ScaleAdjustmentMatrix;
@@ -67,8 +85,8 @@ void UViewmodelStaticMeshComponent::BeginPlay() {
 
 FMatrix UViewmodelStaticMeshComponent::GetRenderMatrix() const {
 	FMatrix Matrix = Super::GetRenderMatrix();
-	if (!bUseViewmodelFOV && !bUseViewmodelScale) return Matrix;
-	FViewmodelMeshes::CalculateViewmodelMatrix(PlayerController, bUseViewmodelFOV, ViewmodelFOV, bUseViewmodelScale, ViewmodelScale, Matrix);
+	if (!ViewmodelData.bUseViewmodelFOV && !ViewmodelData.bUseViewmodelScale) return Matrix;
+	UViewmodelMeshes::CalculateViewmodelMatrix(PlayerController, ViewmodelData, Matrix);
 	return Matrix;
 }
 
@@ -85,7 +103,7 @@ void UViewmodelSkeletalMeshComponent::BeginPlay() {
 
 FMatrix UViewmodelSkeletalMeshComponent::GetRenderMatrix() const {
 	FMatrix Matrix = Super::GetRenderMatrix();
-	if (!bUseViewmodelFOV && !bUseViewmodelScale) return Matrix;
-	FViewmodelMeshes::CalculateViewmodelMatrix(PlayerController, bUseViewmodelFOV, ViewmodelFOV, bUseViewmodelScale, ViewmodelScale, Matrix);
+	if (!ViewmodelData.bUseViewmodelFOV && !ViewmodelData.bUseViewmodelScale) return Matrix;
+	UViewmodelMeshes::CalculateViewmodelMatrix(PlayerController, ViewmodelData, Matrix);
 	return Matrix;
 }

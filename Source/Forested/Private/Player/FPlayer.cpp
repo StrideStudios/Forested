@@ -253,6 +253,10 @@ void AFPlayer::QuitGame() const {
 	UKismetSystemLibrary::QuitGame(this, PlayerController, EQuitPreference::Quit, false);
 }
 
+UPlayerHud* AFPlayer::GetHud() const {
+	return PlayerHud;
+}
+
 void AFPlayer::ShowHud() const {
 	PlayerHud->SetWidgetVisible();
 }

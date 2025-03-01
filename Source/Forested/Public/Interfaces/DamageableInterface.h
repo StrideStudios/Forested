@@ -12,7 +12,7 @@ enum class EDamageType : uint8 {
 	Axe UMETA(DisplayName = "Axe"),
 	Trowel UMETA(DisplayName = "Trowel"),
 	Machete UMETA(DisplayName = "Machete"),
-	StickLauncher UMETA(DisplayName = "Stick Launcher")
+	Gun UMETA(DisplayName = "Gun")
 };
 //ENUM_RANGE_BY_FIRST_AND_LAST(EDamageType, EDamageType::EDT_Basic, EDamageType::EDT_StickLauncher)
 
@@ -53,9 +53,10 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Damageable Interface")
 	static void ApplyDamage(AActor* Actor, AFPlayer* Player, const FHitResult& HitResult, const float Damage, const EDamageType DamageType) {
+		if (!Actor) return;
 		AActor* ActorToDamage = Actor;
-		if (AActor* ParentActor = Actor->GetParentActor())
-			ActorToDamage = ParentActor;
+		if (Actor->IsChildActor())
+			ActorToDamage = Actor->GetParentActor();
 		if (ActorToDamage->GetClass()->ImplementsInterface(UDamageableInterface::StaticClass()))
 			IDamageableInterface::Execute_Damage(ActorToDamage, Player, HitResult, Damage, DamageType);
 	}

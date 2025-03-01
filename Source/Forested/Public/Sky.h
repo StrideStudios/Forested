@@ -266,7 +266,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, SaveGame, Category = "Time", meta = (ClampMin = "0.0", UIMin = "0.0"))
 	int Year = 0;
 
-	UPROPERTY(BlueprintReadOnly, SaveGame, Category = "Time|Rain")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, SaveGame, Category = "Time|Rain", meta = (ClampMin = "0.0", ClampMax = "1.0", UIMin = "0.0", UIMax = "1.0"))
 	float RainValue = 0.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Time")

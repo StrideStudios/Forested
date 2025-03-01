@@ -77,6 +77,12 @@ void UPlayerInventory::LeftInteract() const {
 	}
 }
 
+void UPlayerInventory::EndLeftInteract() const {
+	if (APlayerInventoryActor* InventoryRenderActor = Cast<APlayerInventoryActor>(Player->ItemMesh->GetChildActor())) {
+		InventoryRenderActor->OnLeftEndInteract();
+	}
+}
+
 void UPlayerInventory::RightInteract() const {
 	if (APlayerInventoryActor* InventoryRenderActor = Cast<APlayerInventoryActor>(Player->ItemMesh->GetChildActor())) {
 		InventoryRenderActor->OnRightInteract();
@@ -298,6 +304,11 @@ void UPlayerAnimInstance::LoadAnimationData() {
 	if (Montage && Montage->Montage && Montage->Montage == RenderActor->UnEquipAnimMontage) {
 		Montage->Stop(FAlphaBlend(Montage->GetBlendTime()), false);//TODO: Montage->GetBlend(), 
 	}
+
+	//deinit previous render actor
+	if (RenderActor) {
+		RenderActor->Deinit();
+	}
 	
 	Player->ItemMesh->SetChildActorClass(NextRenderActor);
 	NextRenderActor = nullptr;
@@ -308,10 +319,7 @@ void UPlayerAnimInstance::LoadAnimationData() {
 
 		//set the player's mesh to use the fov of the item
 		if (UViewmodelSkeletalMeshComponent* Mesh = Cast<UViewmodelSkeletalMeshComponent>(Player->GetMesh())) {
-			Mesh->bUseViewmodelFOV = RenderActor->bUseViewmodelFOV;
-			Mesh->ViewmodelFOV = RenderActor->ViewmodelFOV;
-			Mesh->bUseViewmodelScale = RenderActor->bUseViewmodelScale;
-			Mesh->ViewmodelScale = RenderActor->ViewmodelScale;
+			Mesh->ViewmodelData = RenderActor->PlayerViewmodelData;
 		}
 		
 		if (RenderActor->EquipAnimMontage)

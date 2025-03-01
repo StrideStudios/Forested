@@ -151,6 +151,9 @@ public:
 	virtual void QuitGame() const;
 
 	UFUNCTION(BlueprintCallable, Category = "Player")
+	UPlayerHud* GetHud() const;
+	
+	UFUNCTION(BlueprintCallable, Category = "Player")
 	void ShowHud() const;
 	
 	UFUNCTION(BlueprintCallable, Category = "Player")

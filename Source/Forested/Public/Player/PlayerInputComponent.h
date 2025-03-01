@@ -48,8 +48,11 @@ public:
 	FORCEINLINE bool IsSwimming() const { return bSwimming; }
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Player Input Component")
+	FORCEINLINE bool IsHoldingLeftInteract() const { return bHoldingLeftInteract; }
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Player Input Component")
 	FORCEINLINE bool IsHoldingRightInteract() const { return bHoldingRightInteract; }
-
+	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Player Input Component")
 	FORCEINLINE bool IsInWater() const { return bInWater; }
 	
@@ -169,6 +172,8 @@ private:
 	void StopSprint(const FInputActionValue& Value);
 
 	void LeftInteract(const FInputActionValue& Value);
+	
+	void EndLeftInteract(const FInputActionValue& Value);
 
 	void RightInteract(const FInputActionValue& Value);
 
@@ -204,6 +209,8 @@ private:
 	
 	bool bSwimming = false;
 
+	bool bHoldingLeftInteract = false;
+	
 	bool bHoldingRightInteract = false;
 
 	bool bIsAboveWater = true;

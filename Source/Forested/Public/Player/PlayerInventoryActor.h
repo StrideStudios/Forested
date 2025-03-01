@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ViewmodelMeshes.h"
 #include "Forested/ForestedMinimal.h"
 #include "GameFramework/Actor.h"
 #include "PlayerInventoryActor.generated.h"
@@ -22,6 +23,8 @@ public:
 
 	virtual void Init();
 	
+	virtual void Deinit();
+	
 	virtual void InventoryTick(const float DeltaTime) {
 	    ReceiveInventoryTick(DeltaTime);
 	}
@@ -36,6 +39,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, DisplayName = "Init", Category = "Inventory Render Actor")
 	void ReceiveInit();
 
+	UFUNCTION(BlueprintImplementableEvent, DisplayName = "Deinit", Category = "Inventory Render Actor")
+	void ReceiveDeinit();
+	
 	UFUNCTION(BlueprintCallable, BlueprintPure=false, Category = "Inventory Render Actor|Montage")
 	bool StartMontage(UAnimMontage* MontageToPlay, float PlayRate = 1.f, float StartingPosition = 0.f) const; 
 
@@ -67,6 +73,8 @@ public:
 	}
 	
 	virtual void OnLeftInteract();
+	
+	virtual void OnLeftEndInteract();
 
 	virtual void OnRightInteract();
 
@@ -94,21 +102,9 @@ public:
 	bool CanMontageStop(float BlendOutTime, const UAnimMontage* Montage) const;
 	virtual bool CanMontageStop_Implementation(float BlendOutTime,const UAnimMontage* Montage) const;
 
-	//whether to use the viewmodel fov or not
-	UPROPERTY(EditAnywhere, meta = (InlineEditConditionToggle), Category = "Viewmodel")
-	bool bUseViewmodelFOV = true;
-
-	//the fov that will apply to the arms, should be the same as the one on each mesh
-	UPROPERTY(EditAnywhere, meta = (EditCondition="bUseViewmodelFOV", UIMin = "5.0", UIMax = "170", ClampMin = "0.001", ClampMax = "360.0", Units = deg), Category = "Viewmodel")
-	float ViewmodelFOV = 90.0f;
-
-	//whether to use the viewmodel scale or not
-	UPROPERTY(EditAnywhere, meta = (InlineEditConditionToggle), Category = "Viewmodel")
-	bool bUseViewmodelScale = true;
-	
-	//scales the arms toward or away from the camera, should be the same as the one on each mesh
-	UPROPERTY(EditAnywhere, meta = (EditCondition="bUseViewmodelScale", UIMin = "0.0", UIMax = "1.0"), Category = "Viewmodel")
-	float ViewmodelScale = 1.0f;
+	//viewmodel data to use for player arms mesh
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Viewmodel")
+	FViewmodelData PlayerViewmodelData;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
 	USceneComponent* Root;
@@ -164,6 +160,9 @@ protected:
 	
 	UFUNCTION(BlueprintImplementableEvent, DisplayName = "On Left Interact", Category = "Inventory Render Actor|Player")
 	void ReceiveOnLeftInteract(bool IsMontagePlaying);
+
+	UFUNCTION(BlueprintImplementableEvent, DisplayName = "On Left End Interact", Category = "Inventory Render Actor|Player")
+	void ReceiveOnLeftEndInteract(bool IsMontagePlaying);
 
 	UFUNCTION(BlueprintImplementableEvent, DisplayName = "On Right Interact", Category = "Inventory Render Actor|Player")
 	void ReceiveOnRightInteract(bool IsMontagePlaying);

@@ -76,6 +76,8 @@ public:
 	void ChangeItem(int Change);
 
 	void LeftInteract() const;
+	
+	void EndLeftInteract() const;
 
 	void RightInteract() const;
 

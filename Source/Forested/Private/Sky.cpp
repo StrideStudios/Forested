@@ -262,8 +262,9 @@ void ASky::RenderSky(const float DeltaTime) {
 
 	if (SkyCollection && GetWorld()) {
 		UMaterialParameterCollectionInstance* SkyCollectionInstance = GetWorld()->GetParameterCollectionInstance(SkyCollection);
+		SkyCollectionInstance->SetScalarParameterValue("RainValue", GetRainValue());
 		SkyCollectionInstance->SetScalarParameterValue("SunHeight", GetSunHeight());
-		SkyCollectionInstance->SetScalarParameterValue("SkyTime", GetTimePassed());
+		SkyCollectionInstance->SetScalarParameterValue("GameTime", GetTimePassed());
 		SkyCollectionInstance->SetScalarParameterValue("DayTime", GetDaytimePassed());
 		SkyCollectionInstance->SetScalarParameterValue("NightTime", GetNighttimePassed());
 	}

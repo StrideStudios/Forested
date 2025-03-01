@@ -43,6 +43,7 @@ void UPlayerInputComponent::BeginPlay() {
 	BindAction(SprintAction, ETriggerEvent::Completed, this, &UPlayerInputComponent::StopSprint);
 	
 	BindAction(LMBAction, ETriggerEvent::Triggered, this, &UPlayerInputComponent::LeftInteract);
+	BindAction(LMBAction, ETriggerEvent::Completed, this, &UPlayerInputComponent::EndLeftInteract);
 	BindAction(RMBAction, ETriggerEvent::Triggered, this, &UPlayerInputComponent::RightInteract);
 	BindAction(RMBAction, ETriggerEvent::Completed, this, &UPlayerInputComponent::EndRightInteract);
 	BindAction(ButtonAction, ETriggerEvent::Triggered, this, &UPlayerInputComponent::ButtonInteract);
@@ -244,7 +245,19 @@ void UPlayerInputComponent::StopSprint(const FInputActionValue& Value) {
 
 void UPlayerInputComponent::LeftInteract(const FInputActionValue& Value) {
 	if (bSwimming || bInDeepWater || !Player->PlayerInventory) return;
+	if (bHoldingLeftInteract && (bSwimming || bInDeepWater)) {
+		Player->PlayerInventory->EndLeftInteract();
+		bHoldingLeftInteract = false;
+		return;
+	}
 	Player->PlayerInventory->LeftInteract();
+	bHoldingLeftInteract = true;
+}
+
+void UPlayerInputComponent::EndLeftInteract(const FInputActionValue& Value) {
+	if (bSwimming || bInDeepWater || !Player->PlayerInventory) return;
+	Player->PlayerInventory->EndLeftInteract();
+	bHoldingLeftInteract = false;
 }
 
 void UPlayerInputComponent::RightInteract(const FInputActionValue& Value) {
