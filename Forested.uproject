@@ -429,12 +429,18 @@
 		{
 			"Name": "NullSourceCodeAccess",
 			"Enabled": false
+		},
+		{
+			"Name": "BlueprintRetarget",
+			"Enabled": true
 		}
 	],
 	"TargetPlatforms": [
 		"Windows",
 		"WindowsNoEditor",
 		"Linux",
-		"Mac"
+		"Mac",
+		"Android",
+		"IOS"
 	]
 }

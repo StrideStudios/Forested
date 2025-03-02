@@ -35,7 +35,7 @@ AFPlayer::AFPlayer(const FObjectInitializer& ObjectInitializer): Super(
 	Camera->bUsePawnControlRotation = false;
 	ItemMesh = CreateDefaultSubobject<UChildActorComponent>(TEXT("Main Item Mesh"));
 	ItemMesh->SetupAttachment(GetMesh());
-	ItemMesh->SetVisibility(false);
+	ItemMesh->SetVisibility(true);
 	
 	BreathingPoint = CreateDefaultSubobject<USceneComponent>(TEXT("Breathing Point"));
 	BreathingPoint->SetupAttachment(GetCapsuleComponent());
@@ -51,6 +51,9 @@ AFPlayer::AFPlayer(const FObjectInitializer& ObjectInitializer): Super(
 void AFPlayer::BeginPlay() {
 	Super::BeginPlay();
 
+	//make sure we attach the camera
+	Camera->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, "Camera");
+	
 	//assert that the hud class is valid
 	check(!PlayerHudClass.IsNull());
 	
