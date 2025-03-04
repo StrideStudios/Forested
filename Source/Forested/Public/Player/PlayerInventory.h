@@ -14,6 +14,24 @@ class APlayerInventoryActor;
 class ISelectableInterface;
 struct FObjectData;
 
+const FName Name_PrimarySlot = "";
+
+UENUM(BlueprintType)
+enum class EAnimationGroups : uint8 {
+	PrimaryGroup UMETA(DisplayName = "Primary Group"),
+	SecondaryGroup UMETA(DisplayName = "Secondary Group")
+};
+
+FORCEINLINE FName AnimationGroupToName(const EAnimationGroups AnimationGroups) {
+	switch (AnimationGroups) {
+	case EAnimationGroups::PrimaryGroup:
+		return "PrimaryGroup";
+	case EAnimationGroups::SecondaryGroup:
+		return "SecondaryGroup";
+	}
+	return "INVALID";
+}
+
 UENUM(BlueprintType)
 enum class EMovementType : uint8 {
 	Movement UMETA(DisplayName = "Movement"),
@@ -25,6 +43,7 @@ enum class EMovementType : uint8 {
 	EndRightInteract UMETA(DisplayName = "End Right Interact"),
 	ButtonInteract UMETA(DisplayName = "Button Interact")
 };
+
 UCLASS(BlueprintType, Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent, PrioritizeCategories = "Inventory") )
 class FORESTED_API UPlayerInventory : public UInventoryComponent, public IInitInterface {
 	GENERATED_BODY()
@@ -153,9 +172,22 @@ public:
 	/*
 	 * blueprint accessibility functions
 	 */
+
+	/** Get a current Active Montage in this AnimInstance of a certain group. 
+		Note that there might be multiple Active at the same time. This will only return the first active one it finds. **/
+	UFUNCTION(BlueprintPure, Category = "Montage", meta = (NotBlueprintThreadSafe))
+	UAnimMontage* GetCurrentActiveMontageOfGroup(EAnimationGroups AnimationGroup) const;
+
+	UAnimMontage* GetCurrentActiveMontageOfGroup(FName GroupName) const;
+
+	//returns true if any montage is active
+	UFUNCTION(BlueprintCallable, BlueprintPure, meta = (AdvancedDisplay), Category = "Inventory Render Actor|Montage")
+	bool IsAMontageOfGroupActive(EAnimationGroups AnimationGroup, bool IncludeBlendingOut = false) const;
+	
+	bool IsAMontageOfGroupActive(FName GroupName, bool IncludeBlendingOut = false) const;
 	
 	//returns true if any montage is active
-	UFUNCTION(BlueprintCallable, BlueprintPure, meta = (AdvancedDisplay = 1), Category = "Inventory Render Actor|Montage")
+	UFUNCTION(BlueprintCallable, BlueprintPure, meta = (AdvancedDisplay), Category = "Inventory Render Actor|Montage")
 	bool IsAMontageActive(bool IncludeBlendingOut = false) const;
 
 	//returns true if any montage is active and playing
@@ -212,6 +244,15 @@ public:
 	void MontageNotifyEnd(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload);
 	
 protected:
+
+	UPROPERTY(BlueprintReadOnly, Category = "Animation|Player")
+	float PoseBlend = 0.f;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Animation|Player")
+	float TargetPoseBlend = 0.f;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Animation|Player")
+	FVector2D LeanIntensity = FVector2D(1.f);
 	
 	UPROPERTY(BlueprintReadOnly, Category = "Animation|Player")
 	FVector Velocity = FVector(0.f);

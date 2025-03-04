@@ -2,28 +2,41 @@
 #include "Camera/CameraComponent.h"
 #include "Engine/LocalPlayer.h"
 #include "Kismet/GameplayStatics.h"
+#include "Player/FPlayer.h"
 
 //https://sahildhanju.com/posts/render-first-person-fov/
 //https://github.com/tiger-punch-sports-club/ue4-fps-double-camera-separate-fov/blob/master/Source/FovTutorial/MySkeletalMeshComponent.cpp
 //https://github.com/tiger-punch-sports-club/ue4-fps-double-camera-separate-fov/blob/master/Source/FovTutorial/DarkMagic/Utils.h
 //Sahil Dhanju
 
-FVector UViewmodelMeshes::CalculateViewmodelLocation(const APlayerController* PlayerController, const FVector& Location, const FViewmodelData& ViewmodelData) {
-	FMatrix Matrix = FTransform(Location).ToMatrixWithScale();
-	CalculateViewmodelMatrix(PlayerController, ViewmodelData, Matrix);
+FViewmodelVector::operator FVector() const {
+	FMatrix Matrix = FTransform(Vector).ToMatrixWithScale();
+	UViewmodelMeshes::CalculateViewmodelMatrix(PLAYER->GetPlayerController(), ViewmodelData, Matrix);
 	return FTransform(Matrix).GetLocation();
 }
 
-FRotator UViewmodelMeshes::CalculateViewmodelRotation(const APlayerController* PlayerController, const FRotator& Rotation, const FViewmodelData& ViewmodelData) {
+FViewmodelRotator::operator FRotator() const {
 	FMatrix Matrix = FTransform(Rotation).ToMatrixWithScale();
-	CalculateViewmodelMatrix(PlayerController, ViewmodelData, Matrix);
+	UViewmodelMeshes::CalculateViewmodelMatrix(PLAYER->GetPlayerController(), ViewmodelData, Matrix);
 	return FTransform(Matrix).Rotator();
 }
 
-FTransform UViewmodelMeshes::CalculateViewmodelTransform(const APlayerController* PlayerController, const FTransform& Transform, const FViewmodelData& ViewmodelData) {
+FViewmodelTransform::operator FTransform() const {
 	FMatrix Matrix = Transform.ToMatrixWithScale();
-	CalculateViewmodelMatrix(PlayerController, ViewmodelData, Matrix);
+	UViewmodelMeshes::CalculateViewmodelMatrix(PLAYER->GetPlayerController(), ViewmodelData, Matrix);
 	return FTransform(Matrix);
+}
+
+FVector UViewmodelMeshes::Conv_ViewmodelVectorToVector(const FViewmodelVector& Vector) {
+	return FVector(Vector);
+}
+
+FRotator UViewmodelMeshes::Conv_ViewmodelRotatorToRotator(const FViewmodelRotator& Rotator) {
+	return FRotator(Rotator);
+}
+
+FTransform UViewmodelMeshes::Conv_ViewmodelTransformToTransform(const FViewmodelTransform& Transform) {
+	return FTransform(Transform);
 }
 
 void UViewmodelMeshes::CalculateViewmodelMatrix(const APlayerController* PlayerController, const FViewmodelData& ViewmodelData, FMatrix& InOutMatrix) {

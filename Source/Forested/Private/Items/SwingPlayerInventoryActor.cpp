@@ -1,4 +1,4 @@
-#include "Items/SwingInventoryRenderActor.h"
+#include "Items/SwingPlayerInventoryActor.h"
 #include "Interfaces/DamageableInterface.h"
 #include "Player/FPlayer.h"
 #include "NiagaraComponent.h"
@@ -8,7 +8,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 
-ASwingInventoryRenderActor::ASwingInventoryRenderActor() {
+ASwingPlayerInventoryActor::ASwingPlayerInventoryActor() {
 	PrimaryActorTick.bCanEverTick = false;
 	DamageType = EDamageType::Axe;
 	
@@ -23,7 +23,7 @@ ASwingInventoryRenderActor::ASwingInventoryRenderActor() {
 	WeaponSwing->SetVisibility(false);
 }
 
-void ASwingInventoryRenderActor::InventoryTick(const float DeltaTime) {
+void ASwingPlayerInventoryActor::InventoryTick(const float DeltaTime) {
 	if (Delay > 0.f) Delay = Delay - DeltaTime;
 	WeaponSwing->SetVisibility(CanHit());
 	if (CanHit()) {
@@ -60,33 +60,33 @@ void ASwingInventoryRenderActor::InventoryTick(const float DeltaTime) {
 	Super::InventoryTick(DeltaTime);
 }
 
-void ASwingInventoryRenderActor::OnMontageNotifyBegin(const UAnimMontage* Montage, const FName Notify) {
+void ASwingPlayerInventoryActor::OnMontageNotifyBegin(const UAnimMontage* Montage, const FName Notify) {
 	Super::OnMontageNotifyBegin(Montage, Notify);
 	if (Notify == "CanHit") {
 		bCanHit = true;
 	}
 }
 
-void ASwingInventoryRenderActor::OnMontageNotifyEnd(const UAnimMontage* Montage, const FName Notify) {
+void ASwingPlayerInventoryActor::OnMontageNotifyEnd(const UAnimMontage* Montage, const FName Notify) {
 	Super::OnMontageNotifyEnd(Montage, Notify);
 	if (Notify == "CanHit") {
 		bCanHit = false;
 	}
 }
 
-void ASwingInventoryRenderActor::OnMontageBlendOut(const UAnimMontage* Montage, const bool bInterrupted) {
+void ASwingPlayerInventoryActor::OnMontageBlendOut(const UAnimMontage* Montage, const bool bInterrupted) {
 	if (SwingMontage && SwingMontage == Montage) {
 		WeaponSwing->SetVisibility(false);
 		PLAYER->EnablePlayerMovement();
 	}
 }
 
-bool ASwingInventoryRenderActor::CanMontagePlay_Implementation(const UAnimMontage* Montage, const float PlayRate, const float StartingPosition) const {
-	return Super::CanMontagePlay_Implementation(Montage, PlayRate, StartingPosition) && !IsSwinging() && CanSwing();
+bool ASwingPlayerInventoryActor::CanMontagePlay_Implementation(const UAnimMontage* Montage, const float PlayRate, const float StartingPosition) const {
+	return !IsSwinging() && CanSwing();
 }
 
-bool ASwingInventoryRenderActor::Swing(UAnimMontage* Montage, const FAlphaBlend& InHitBlend, const float InHitDelay, const float PlayRate, const float StartingPosition) {
-	if (StartMontage(Montage, PlayRate, StartingPosition)) {
+bool ASwingPlayerInventoryActor::Swing(UAnimMontage* Montage, const FAlphaBlend& InHitBlend, const float InHitDelay, const float PlayRate, const float StartingPosition, const bool bStacked) {
+	if (bStacked ? StartStackedMontage(Montage, PlayRate, StartingPosition) : StartMontage(Montage, PlayRate, StartingPosition)) {
 		SwingMontage = Montage;
 		HitBlend = InHitBlend;
 		HitDelay = InHitDelay;
@@ -98,7 +98,7 @@ bool ASwingInventoryRenderActor::Swing(UAnimMontage* Montage, const FAlphaBlend&
 	return false;
 }
 
-bool ASwingInventoryRenderActor::IsSwinging() const {
+bool ASwingPlayerInventoryActor::IsSwinging() const {
 	if (!SwingMontage) return false;
 	if (const UAnimInstance* AnimInstance = PLAYER->GetMesh()->GetAnimInstance()) {
 		return AnimInstance->Montage_IsActive(SwingMontage);

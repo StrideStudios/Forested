@@ -54,15 +54,22 @@ UPlayerAnimInstance* APlayerInventoryActor::GetPlayerAnimInstance() {
 }
 
 bool APlayerInventoryActor::StartMontage(UAnimMontage* MontageToPlay, const float PlayRate, const float StartingPosition) const {
-	if (!bAnimationsLoaded || !MontageToPlay || !CanMontagePlay(MontageToPlay, PlayRate, StartingPosition)) return false;
+	const FName SlotName = MontageToPlay->GetGroupName();
+	if (!bAnimationsLoaded || !MontageToPlay || GetPlayerAnimInstance()->IsAMontageOfGroupActive(SlotName) || !CanMontagePlay(MontageToPlay, PlayRate, StartingPosition)) return false;
 	const float f = GetPlayerAnimInstance()->Montage_Play(MontageToPlay, PlayRate, EMontagePlayReturnType::MontageLength, StartingPosition);
+	return f > 0.f;
+}
+
+bool APlayerInventoryActor::StartStackedMontage(UAnimMontage* MontageToPlay, const float PlayRate, const float StartingPosition) const {
+	if (!bAnimationsLoaded || !MontageToPlay || !CanMontagePlay(MontageToPlay, PlayRate, StartingPosition)) return false;
+	const float f = GetPlayerAnimInstance()->Montage_Play(MontageToPlay, PlayRate, EMontagePlayReturnType::MontageLength, StartingPosition, false);
 	return f > 0.f;
 }
 
 bool APlayerInventoryActor::PauseMontage(const UAnimMontage* Montage) const {
 	if (!bAnimationsLoaded) return false;
 	FAnimMontageInstance* ActiveMontage = GetPlayerAnimInstance()->GetMontageInstance(Montage, true); 
-	if (ActiveMontage && CanMontagePause(ActiveMontage->Montage)) {
+	if (ActiveMontage && GetPlayerAnimInstance()->IsMontageActive(Montage) && CanMontagePause(ActiveMontage->Montage)) {
 		ActiveMontage->Pause();
 		return true;
 	}
@@ -72,7 +79,7 @@ bool APlayerInventoryActor::PauseMontage(const UAnimMontage* Montage) const {
 bool APlayerInventoryActor::ResumeMontage(const UAnimMontage* Montage) const {
 	if (!bAnimationsLoaded) return false;
 	FAnimMontageInstance* ActiveMontage = GetPlayerAnimInstance()->GetMontageInstance(Montage, true); 
-	if (ActiveMontage && !ActiveMontage->IsPlaying() && CanMontageResume(ActiveMontage->Montage)) {
+	if (ActiveMontage && !ActiveMontage->IsPlaying() && GetPlayerAnimInstance()->IsMontageActive(Montage) && !GetPlayerAnimInstance()->IsMontagePlaying(Montage) && CanMontageResume(ActiveMontage->Montage)) {
 		ActiveMontage->SetPlaying(true);
 		return true;
 	}
@@ -80,7 +87,7 @@ bool APlayerInventoryActor::ResumeMontage(const UAnimMontage* Montage) const {
 }
 //TODO: library and parity between this and player inventory
 bool APlayerInventoryActor::StopMontage(const float BlendOutTime, const UAnimMontage* Montage) const {
-	if (!CanMontageStop(BlendOutTime, Montage)) return false;
+	if (!GetPlayerAnimInstance()->IsMontageActive(Montage) || !CanMontageStop(BlendOutTime, Montage)) return false;
 	FAlphaBlend Blend = FAlphaBlend(Montage->BlendOut);
 	Blend.SetBlendTime(BlendOutTime);
 	return StopMontage(Blend, Montage);
@@ -113,22 +120,6 @@ void APlayerInventoryActor::OnRightEndInteract() {
 
 void APlayerInventoryActor::OnButtonInteract() {
 	ReceiveOnButtonInteract(GetPlayerAnimInstance()->IsAMontageActive());
-}
-
-bool APlayerInventoryActor::CanMontagePlay_Implementation(const UAnimMontage* Montage, float PlayRate, float StartingPosition) const {
-	return !GetPlayerAnimInstance()->IsAMontageActive();
-}
-
-bool APlayerInventoryActor::CanMontagePause_Implementation(const UAnimMontage* Montage) const {
-	return GetPlayerAnimInstance()->IsMontageActive(Montage);
-}
-
-bool APlayerInventoryActor::CanMontageResume_Implementation(const UAnimMontage* Montage) const {
-	return GetPlayerAnimInstance()->IsMontageActive(Montage) && !GetPlayerAnimInstance()->IsMontagePlaying(Montage);
-}
-
-bool APlayerInventoryActor::CanMontageStop_Implementation(float BlendOutTime, const UAnimMontage* Montage) const {
-	return GetPlayerAnimInstance()->IsMontageActive(Montage);
 }
 
 bool APlayerInventoryActor::HasItem() {

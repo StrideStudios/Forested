@@ -213,8 +213,9 @@ void UPlayerAnimInstance::NativeBeginPlay() {
 	OnPlayMontageNotifyEnd.AddUniqueDynamic(this, &UPlayerAnimInstance::MontageNotifyEnd);
 }
 
-void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds) {
+void UPlayerAnimInstance::NativeUpdateAnimation(const float DeltaSeconds) {
 	if (!Player) return;
+	PoseBlend = FMath::FInterpTo(PoseBlend, TargetPoseBlend, DeltaSeconds, 10.f);
 	Velocity = Player->GetVelocity();
 	Player->PlayerInputComponent->GetMovementVector(RightMovement, ForwardMovement);
 	ForwardVelocity = Player->GetForwardVelocity();
@@ -312,6 +313,13 @@ void UPlayerAnimInstance::LoadAnimationData() {
 	
 	Player->ItemMesh->SetChildActorClass(NextRenderActor);
 	NextRenderActor = nullptr;
+
+	//reset lean intensities
+	LeanIntensity = FVector2D(1.f);
+
+	//reset pose blend
+	PoseBlend = 0.f;
+	TargetPoseBlend = 0.f;
 	
 	if (APlayerInventoryActor* ItemRenderActor = Cast<APlayerInventoryActor>(Player->ItemMesh->GetChildActor())) {
 		RenderActor = ItemRenderActor;
@@ -353,6 +361,37 @@ FAnimMontageInstance* UPlayerAnimInstance::GetAnyActiveMontageInstance(const boo
 			return MontageInstance;
 	}
 	return nullptr;
+}
+
+UAnimMontage* UPlayerAnimInstance::GetCurrentActiveMontageOfGroup(const EAnimationGroups AnimationGroup) const {
+	const FName GroupName = AnimationGroupToName(AnimationGroup);
+	return GetCurrentActiveMontageOfGroup(GroupName);
+}
+
+UAnimMontage* UPlayerAnimInstance::GetCurrentActiveMontageOfGroup(const FName GroupName) const {
+	// Start from end, as most recent instances are added at the end of the queue.
+	int32 const NumInstances = MontageInstances.Num();
+	for (int32 InstanceIndex = NumInstances - 1; InstanceIndex >= 0; InstanceIndex--) {
+		const FAnimMontageInstance* MontageInstance = MontageInstances[InstanceIndex];
+		if (MontageInstance && MontageInstance->Montage && MontageInstance->Montage->GetGroupName() == GroupName && MontageInstance->IsActive()) {
+			return MontageInstance->Montage;
+		}
+	}
+
+	return nullptr;
+}
+
+bool UPlayerAnimInstance::IsAMontageOfGroupActive(const EAnimationGroups AnimationGroup, const bool IncludeBlendingOut) const {
+	const FName GroupName = AnimationGroupToName(AnimationGroup);
+	return IsAMontageOfGroupActive(GroupName, IncludeBlendingOut);
+}
+
+bool UPlayerAnimInstance::IsAMontageOfGroupActive(const FName GroupName, const bool IncludeBlendingOut) const {
+	for (const FAnimMontageInstance* MontageInstance : MontageInstances) {
+		if (MontageInstance && MontageInstance->Montage && MontageInstance->Montage->GetGroupName() == GroupName && IsMontageInstanceActive(MontageInstance, IncludeBlendingOut))
+			return true;
+	}
+	return false;
 }
 
 bool UPlayerAnimInstance::IsAMontageActive(const bool IncludeBlendingOut) const {

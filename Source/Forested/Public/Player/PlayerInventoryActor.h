@@ -46,6 +46,9 @@ public:
 	bool StartMontage(UAnimMontage* MontageToPlay, float PlayRate = 1.f, float StartingPosition = 0.f) const; 
 
 	UFUNCTION(BlueprintCallable, BlueprintPure=false, Category = "Inventory Render Actor|Montage")
+	bool StartStackedMontage(UAnimMontage* MontageToPlay, float PlayRate = 1.f, float StartingPosition = 0.f) const; 
+
+	UFUNCTION(BlueprintCallable, BlueprintPure=false, Category = "Inventory Render Actor|Montage")
 	bool PauseMontage(const UAnimMontage* Montage = nullptr) const; 
 
 	UFUNCTION(BlueprintCallable, BlueprintPure=false, Category = "Inventory Render Actor|Montage")
@@ -88,19 +91,19 @@ public:
 	
 	UFUNCTION(BlueprintNativeEvent, Category = "Inventory Render Actor|Montage")
 	bool CanMontagePlay(const UAnimMontage* Montage, float PlayRate, float StartingPosition) const;
-	virtual bool CanMontagePlay_Implementation(const UAnimMontage* Montage, float PlayRate, float StartingPosition) const;
+	virtual bool CanMontagePlay_Implementation(const UAnimMontage* Montage, float PlayRate, float StartingPosition) const { return true; }
 
 	UFUNCTION(BlueprintNativeEvent, Category = "Inventory Render Actor|Montage")
 	bool CanMontagePause(const UAnimMontage* Montage) const;
-	virtual bool CanMontagePause_Implementation(const UAnimMontage* Montage) const;
+	virtual bool CanMontagePause_Implementation(const UAnimMontage* Montage) const { return true; }
 
 	UFUNCTION(BlueprintNativeEvent, Category = "Inventory Render Actor|Montage")
 	bool CanMontageResume(const UAnimMontage* Montage) const;
-	virtual bool CanMontageResume_Implementation(const UAnimMontage* Montage) const;
+	virtual bool CanMontageResume_Implementation(const UAnimMontage* Montage) const { return true; }
 
 	UFUNCTION(BlueprintNativeEvent, Category = "Inventory Render Actor|Montage")
 	bool CanMontageStop(float BlendOutTime, const UAnimMontage* Montage) const;
-	virtual bool CanMontageStop_Implementation(float BlendOutTime,const UAnimMontage* Montage) const;
+	virtual bool CanMontageStop_Implementation(float BlendOutTime,const UAnimMontage* Montage) const { return true; }
 
 	//viewmodel data to use for player arms mesh
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Viewmodel")

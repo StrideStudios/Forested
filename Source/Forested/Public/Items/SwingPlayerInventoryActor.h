@@ -3,7 +3,7 @@
 #include "Forested/ForestedMinimal.h"
 #include "AlphaBlend.h"
 #include "Player/PlayerInventoryActor.h"
-#include "SwingInventoryRenderActor.generated.h"
+#include "SwingPlayerInventoryActor.generated.h"
 
 enum class EDamageType : uint8;
 class UNiagaraComponent;
@@ -12,12 +12,12 @@ class UNiagaraSystem;
 class UCurveVector;
 
 UCLASS(BlueprintType, meta = (PrioritizeCategories = "Damage"))
-class FORESTED_API ASwingInventoryRenderActor : public APlayerInventoryActor {
+class FORESTED_API ASwingPlayerInventoryActor : public APlayerInventoryActor {
 	GENERATED_BODY()
 
 public:
 	
-	ASwingInventoryRenderActor();
+	ASwingPlayerInventoryActor();
 
 	virtual void InventoryTick(float DeltaTime) override;
 	
@@ -29,19 +29,19 @@ public:
 
 	virtual bool CanMontagePlay_Implementation(const UAnimMontage* Montage, float PlayRate, float StartingPosition) const override;
 	
-	UFUNCTION(BlueprintCallable, Category = "Swing Inventory Render Actor")
-	bool Swing(UAnimMontage* Montage, const FAlphaBlend& InHitBlend, float InHitDelay = 0.3f, float PlayRate = 1.f, float StartingPosition = 0.f);
+	UFUNCTION(BlueprintCallable, Category = "Swing Player Inventory Actor")
+	bool Swing(UAnimMontage* Montage, const FAlphaBlend& InHitBlend, float InHitDelay = 0.3f, float PlayRate = 1.f, float StartingPosition = 0.f, bool bStacked = false);
 
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Swing Inventory Render Actor")
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Swing Player Inventory Actor")
 	FORCEINLINE bool IsSwinging() const;
 
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Swing Inventory Render Actor")
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Swing Player Inventory Actor")
 	FORCEINLINE bool CanSwing() const { return Delay <= 0.f && !IsSwinging(); }
 
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Swing Inventory Render Actor")
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Swing Player Inventory Actor")
 	FORCEINLINE bool HasHit() const { return bHit; }
 
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Swing Inventory Render Actor")
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Swing Player Inventory Actor")
 	FORCEINLINE bool CanHit() const { return bCanHit; }
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
@@ -56,16 +56,18 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
 	UNiagaraComponent* WeaponSwing;
 
-private:
+protected:
 
-	UPROPERTY(EditDefaultsOnly, Category = "Damage")
-	EDamageType DamageType;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Damage")
+	UNiagaraSystem* HitNiagaraSystem = nullptr;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "Damage")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Damage")
 	float Damage = 15.f;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Damage")
-	UNiagaraSystem* HitNiagaraSystem = nullptr;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Damage")
+	EDamageType DamageType;
+
+private:
 	
 	float HitDelay = 0.f;
 

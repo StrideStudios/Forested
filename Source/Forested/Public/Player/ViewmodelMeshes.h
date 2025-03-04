@@ -27,23 +27,71 @@ struct FViewmodelData {
 	float ViewmodelScale = 1.0f;
 };
 
+USTRUCT(BlueprintType)
+struct FViewmodelVector {
+	GENERATED_BODY()
+
+	//the viewmodel data to use
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Viewmodel")
+	FViewmodelData ViewmodelData;
+
+	//the vector to apply the viewmodel data to
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Viewmodel")
+	FVector Vector;
+
+	operator FVector() const;
+	
+};
+
+USTRUCT(BlueprintType)
+struct FViewmodelRotator {
+	GENERATED_BODY()
+
+	//the viewmodel data to use
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Viewmodel")
+	FViewmodelData ViewmodelData;
+
+	//the rotator to apply the viewmodel data to
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Viewmodel")
+	FRotator Rotation;
+
+	operator FRotator() const;
+	
+};
+
+USTRUCT(BlueprintType)
+struct FViewmodelTransform {
+	GENERATED_BODY()
+
+	//the viewmodel data to use
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Viewmodel")
+	FViewmodelData ViewmodelData;
+
+	//the transform to apply the viewmodel data to
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Viewmodel")
+	FTransform Transform;
+
+	operator FTransform() const;
+	
+};
+
 UCLASS()
 class FORESTED_API UViewmodelMeshes : public UBlueprintFunctionLibrary {
 	GENERATED_BODY()
 	
 public:
-
-	//correct a position attached to camera to fit with a certain viewmodel fov or scale
-	UFUNCTION(BlueprintCallable, meta = (AdvancedDisplay = 1), Category = "Viewmodel")
-	static FVector CalculateViewmodelLocation(const APlayerController* PlayerController, const FVector& Location, const FViewmodelData& ViewmodelData);
-
-	//correct a rotation attached to camera to fit with a certain viewmodel fov or scale
-	UFUNCTION(BlueprintCallable, meta = (AdvancedDisplay = 1), Category = "Viewmodel")
-	static FRotator CalculateViewmodelRotation(const APlayerController* PlayerController, const FRotator& Rotation, const FViewmodelData& ViewmodelData);
+	
+	//correct a vector attached to camera to fit with a certain viewmodel fov or scale
+	UFUNCTION(BlueprintCallable, BlueprintPure, meta = (DisplayName = "Convert To Vector", CompactNodeTitle = "->", BlueprintAutocast), Category = "Viewmodel")
+	static FVector Conv_ViewmodelVectorToVector(const FViewmodelVector& Vector);
+	
+	//correct a rotator attached to camera to fit with a certain viewmodel fov or scale
+	UFUNCTION(BlueprintCallable, BlueprintPure, meta = (DisplayName = "Convert To Rotator", CompactNodeTitle = "->", BlueprintAutocast), Category = "Viewmodel")
+	static FRotator Conv_ViewmodelRotatorToRotator(const FViewmodelRotator& Rotator);
 	
 	//correct a transform attached to camera to fit with a certain viewmodel fov or scale
-	UFUNCTION(BlueprintCallable, meta = (AdvancedDisplay = 1), Category = "Viewmodel")
-	static FTransform CalculateViewmodelTransform(const APlayerController* PlayerController, const FTransform& Transform, const FViewmodelData& ViewmodelData);
+	UFUNCTION(BlueprintCallable, BlueprintPure, meta = (DisplayName = "Convert To Transform", CompactNodeTitle = "->", BlueprintAutocast), Category = "Viewmodel")
+	static FTransform Conv_ViewmodelTransformToTransform(const FViewmodelTransform& Transform);
 	
 	static void CalculateViewmodelMatrix(const APlayerController* PlayerController, const FViewmodelData& ViewmodelData, FMatrix& InOutMatrix);
 

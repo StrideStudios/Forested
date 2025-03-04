@@ -2,7 +2,7 @@
 
 #include "Forested/ForestedMinimal.h"
 #include "Player/PlayerInventoryActor.h"
-#include "ThrowableInventoryRenderActor.generated.h"
+#include "ThrowablePlayerInventoryActor.generated.h"
 
 struct FPredictProjectilePathResult;
 class USphereComponent;
@@ -25,12 +25,12 @@ public:
 };
 
 UCLASS(BlueprintType, meta = (PrioritizeCategories = "Throwable Components"))
-class FORESTED_API AThrowableInventoryRenderActor : public APlayerInventoryActor {
+class FORESTED_API AThrowablePlayerInventoryActor : public APlayerInventoryActor {
 	GENERATED_BODY()
 
 public:
 	
-	AThrowableInventoryRenderActor();
+	AThrowablePlayerInventoryActor();
 
 	virtual void Init() override;
 	

@@ -13,13 +13,14 @@
 #include "Player/ViewmodelMeshes.h"
 #include "Components/SphereComponent.h"
 
-AFPlayer::AFPlayer(const FObjectInitializer& ObjectInitializer): Super(
-	ObjectInitializer.SetDefaultSubobjectClass<UPlayerMovementComponent>(CharacterMovementComponentName)
+AFPlayer::AFPlayer(const FObjectInitializer& ObjectInitializer): Super(ObjectInitializer
+	.SetDefaultSubobjectClass<UPlayerMovementComponent>(CharacterMovementComponentName)
 	.SetDefaultSubobjectClass<UViewmodelSkeletalMeshComponent>(MeshComponentName)) {
 	
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
-	
+
+	GetMesh()->bSelfShadowOnly = true;
 	GetMesh()->SetRelativeLocation(FVector(0.0f, 0.0f, BaseEyeHeight));
 	CrouchedEyeHeight = GetCharacterMovement()->CrouchedHalfHeight * 0.80f;
 	

@@ -248,7 +248,7 @@ void UPlayerInputComponent::LeftInteract(const FInputActionValue& Value) {
 	if (bHoldingLeftInteract && (bSwimming || bInDeepWater)) {
 		Player->PlayerInventory->EndLeftInteract();
 		bHoldingLeftInteract = false;
-		return;
+		return; 
 	}
 	Player->PlayerInventory->LeftInteract();
 	bHoldingLeftInteract = true;
