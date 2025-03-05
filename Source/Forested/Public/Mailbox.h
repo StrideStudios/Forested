@@ -9,15 +9,22 @@
 class AMailbox;
 class UBoxComponent;
 
-UCLASS(Blueprintable, meta=(PrioritizeCategories = "Widget Components"))
+UCLASS(Blueprintable)
 class FORESTED_API UMailboxWidget : public UPlayerWidget {
 	GENERATED_BODY()
 
 public:
 
-	UFUNCTION(BlueprintImplementableEvent)
-	void ActivateMailboxWidget(AMailbox* Mailbox);
+	UFUNCTION(BlueprintCallable, Category = "Mailbox Widget")
+	void ActivateMailboxWidget(AMailbox* InMailbox);
 
+	UFUNCTION(BlueprintCallable, Category = "Mailbox Widget")
+	void CloseMailboxMenu();
+
+protected:
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Mailbox Widget")
+	AMailbox* Mailbox;
 };
 
 UCLASS(Blueprintable, meta=(PrioritizeCategories = "Widget Components"))
@@ -33,6 +40,12 @@ protected:
 public:
 
 	virtual bool Selected_Implementation(AFPlayer* Player, const FHitResult& HitResult, float HeldTime) override;
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Mailbox")
+	void OpenMailbox();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Mailbox")
+	void CloseMailbox();
 	
 protected:
 

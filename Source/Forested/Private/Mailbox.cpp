@@ -2,7 +2,18 @@
 #include "Player/FPlayer.h"
 #include "Widget/PlayerWidget.h"
 #include "Components/BoxComponent.h"
+#include "Player/PlayerHud.h"
+#include "Player/PlayerInventory.h"
 #include "Serialization/SerializationLibrary.h"
+
+void UMailboxWidget::ActivateMailboxWidget(AMailbox* InMailbox) {
+	Mailbox = InMailbox;
+}
+
+void UMailboxWidget::CloseMailboxMenu() {
+	RemoveFromParent();
+	Mailbox->CloseMailbox();
+}
 
 AMailbox::AMailbox() {
 	PrimaryActorTick.bCanEverTick = false;
@@ -26,6 +37,15 @@ bool AMailbox::Selected_Implementation(AFPlayer* Player, const FHitResult& HitRe
 	MailboxWidget = CreateWidget<UMailboxWidget>(Player->GetPlayerController(), WidgetClass.Get());
 	MailboxWidget->AddToViewport(1);
 	MailboxWidget->ActivateMailboxWidget(this);
+
+	if (!Player->PlayerInventory->ClearSelectedItem()) {
+		return false;
+	}
+
+	Player->SetUIFocus(MailboxWidget);
+	Player->GetHud()->HideHud();
+	OpenMailbox();
+	
 	return true;
 }
 
