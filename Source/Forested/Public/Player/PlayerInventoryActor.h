@@ -46,9 +46,6 @@ public:
 	bool StartMontage(UAnimMontage* MontageToPlay, float PlayRate = 1.f, float StartingPosition = 0.f) const; 
 
 	UFUNCTION(BlueprintCallable, BlueprintPure=false, Category = "Inventory Render Actor|Montage")
-	bool StartStackedMontage(UAnimMontage* MontageToPlay, float PlayRate = 1.f, float StartingPosition = 0.f) const; 
-
-	UFUNCTION(BlueprintCallable, BlueprintPure=false, Category = "Inventory Render Actor|Montage")
 	bool PauseMontage(const UAnimMontage* Montage = nullptr) const; 
 
 	UFUNCTION(BlueprintCallable, BlueprintPure=false, Category = "Inventory Render Actor|Montage")
@@ -68,6 +65,10 @@ public:
 	}
 
 	virtual void OnMontageNotifyBegin(const UAnimMontage* Montage, const FName Notify) {
+		//pause montage can be built in because it is common
+		if (Notify == "PauseMontage") {
+			PauseMontage(Montage);
+		}
 		ReceiveOnMontageNotifyBegin(Montage, Notify);
 	}
 

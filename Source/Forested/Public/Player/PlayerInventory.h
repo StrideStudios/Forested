@@ -242,17 +242,17 @@ public:
 	
 	UFUNCTION()
 	void MontageNotifyEnd(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload);
-	
-protected:
-
-	UPROPERTY(BlueprintReadOnly, Category = "Animation|Player")
-	float PoseBlend = 0.f;
 
 	UPROPERTY(BlueprintReadWrite, Category = "Animation|Player")
 	float TargetPoseBlend = 0.f;
 
 	UPROPERTY(BlueprintReadWrite, Category = "Animation|Player")
 	FVector2D LeanIntensity = FVector2D(1.f);
+	
+protected:
+
+	UPROPERTY(BlueprintReadOnly, Category = "Animation|Player")
+	float PoseBlend = 0.f;
 	
 	UPROPERTY(BlueprintReadOnly, Category = "Animation|Player")
 	FVector Velocity = FVector(0.f);

@@ -12,7 +12,7 @@ struct FViewmodelData {
 
 	//whether to use the viewmodel fov or not
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (InlineEditConditionToggle), Category = "Viewmodel")
-	bool bUseViewmodelFOV = true;
+	bool bUseViewmodelFOV = false;
 
 	//the fov that will apply to the viewmodel
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition="bUseViewmodelFOV", UIMin = "5.0", UIMax = "170", ClampMin = "0.001", ClampMax = "360.0", Units = deg), Category = "Viewmodel")
@@ -20,7 +20,7 @@ struct FViewmodelData {
 
 	//whether to use the viewmodel scale or not
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (InlineEditConditionToggle), Category = "Viewmodel")
-	bool bUseViewmodelScale = true;
+	bool bUseViewmodelScale = false;
 	
 	//scales the mesh toward or away from the camera
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition="bUseViewmodelScale", UIMin = "0.0", UIMax = "1.0"), Category = "Viewmodel")

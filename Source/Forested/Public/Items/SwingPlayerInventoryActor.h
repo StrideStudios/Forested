@@ -30,7 +30,7 @@ public:
 	virtual bool CanMontagePlay_Implementation(const UAnimMontage* Montage, float PlayRate, float StartingPosition) const override;
 	
 	UFUNCTION(BlueprintCallable, Category = "Swing Player Inventory Actor")
-	bool Swing(UAnimMontage* Montage, const FAlphaBlend& InHitBlend, float InHitDelay = 0.3f, float PlayRate = 1.f, float StartingPosition = 0.f, bool bStacked = false);
+	bool Swing(UAnimMontage* Montage, const FAlphaBlend& InHitBlend, float InHitDelay = 0.3f, float PlayRate = 1.f, float StartingPosition = 0.f);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Swing Player Inventory Actor")
 	FORCEINLINE bool IsSwinging() const;

@@ -2,15 +2,62 @@
 
 #include "NiagaraFunctionLibrary.h"
 #include "Interfaces/DamageableInterface.h"
+#include "Kismet/GameplayStatics.h"
 #include "Player/FPlayer.h"
+#include "Player/PlayerInventory.h"
 
 AShootPlayerInventoryActor::AShootPlayerInventoryActor() {
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
+	SetTickGroup(TG_PostUpdateWork);
+}
+
+void AShootPlayerInventoryActor::Init() {
+	Super::Init();
+	if (!WidgetClass) return;
+	ShootWidget = NewObject<UShootWidget>(GetWorld(), WidgetClass);
+	ShootWidget->AddToViewport();
+}
+
+void AShootPlayerInventoryActor::Deinit() {
+	Super::Deinit();
+	if (!ShootWidget) return;
+	ShootWidget->RemoveFromParent();
+}
+
+void AShootPlayerInventoryActor::OnMontageBlendOut(const UAnimMontage* Montage, const bool bInterrupted) {
+	Super::OnMontageBlendOut(Montage, bInterrupted);
+	if (ShootMontage && ShootMontage == Montage) {
+		PLAYER->EnablePlayerMovement();
+		EndShot();
+	}
+}
+
+bool AShootPlayerInventoryActor::TraceShot(FHitResult& OutHit, const FVector ShootLocation, const float Rotation, const float InSpread) {
+	if (!GetWorld() || !GetMesh()) return false;
+
+	const float TrueSpread = InSpread * Range;
+	const float TraceDistanceX = FMath::Cos(Rotation) * TrueSpread;
+	const float TraceDistanceY = FMath::Sin(Rotation) * TrueSpread;
+	const FVector TraceLocationX = GetMesh()->GetRightVector() * TraceDistanceX;
+	const FVector TraceLocationY = GetMesh()->GetUpVector() * TraceDistanceY;
+
+	const FVector EndDistance = GetMesh()->GetForwardVector() * Range;
+
+	const FVector EndLocation = ShootLocation + EndDistance + TraceLocationX + TraceLocationY;
+
+	FCollisionQueryParams Params;
+	Params.bFindInitialOverlaps = false;
+	Params.bReturnFaceIndex = false;
+	Params.bReturnPhysicalMaterial = false;
+	Params.bTraceComplex = true;
+	Params.bIgnoreTouches = true;
 	
+	return GetWorld()->LineTraceSingleByChannel(OutHit, ShootLocation, EndLocation, ECC_Visibility, Params);
 }
 
 bool AShootPlayerInventoryActor::Shoot(UAnimMontage* Montage, const FViewmodelVector ShootLocation, const float PlayRate, const float StartingPosition, const bool Aimed) {
 	if (StartMontage(Montage, PlayRate, StartingPosition)) {
+		ShootMontage = Montage;
 		
 		PLAYER->AddControllerPitchInput(-0.1f);
 		
@@ -34,26 +81,49 @@ bool AShootPlayerInventoryActor::Shoot(UAnimMontage* Montage, const FViewmodelVe
 	}
 	return false;
 }
-//TODO: way to inject stuff into player hud
-bool AShootPlayerInventoryActor::TraceShot(FHitResult& OutHit, const FVector ShootLocation, const float Rotation, const float InSpread) {
-	if (!GetWorld() || !GetMesh()) return false;
 
-	const float TrueSpread = InSpread * Range;
-	const float TraceDistanceX = FMath::Cos(Rotation) * TrueSpread;
-	const float TraceDistanceY = FMath::Sin(Rotation) * TrueSpread;
-	const FVector TraceLocationX = GetMesh()->GetRightVector() * TraceDistanceX;
-	const FVector TraceLocationY = GetMesh()->GetUpVector() * TraceDistanceY;
+bool AShootPlayerInventoryActor::Aim(UAnimMontage* Montage, const float PlayRate, const float StartingPosition) {
+	if (StartMontage(Montage, PlayRate, StartingPosition)) {
+		if (ShootWidget) {
+			ShootWidget->OnAim(this);
+		}
+		GetPlayerAnimInstance()->LeanIntensity = LeanIntensity;
+		GetPlayerAnimInstance()->TargetPoseBlend = 1.f;
+		return true;
+	}
+	return false;
+}
 
-	const FVector EndDistance = GetMesh()->GetForwardVector() * Range;
+bool AShootPlayerInventoryActor::UnAim(UAnimMontage* Montage) {
+	if (ShootWidget) {
+		ShootWidget->OnUnaim(this);
+	}
+	GetPlayerAnimInstance()->LeanIntensity = FVector2D(1.f);
+	GetPlayerAnimInstance()->TargetPoseBlend = 0.f;
+	if (ResumeMontage(Montage)) {
+		return true;
+	}
+	StopMontage(0.25f, Montage);
+	return false;
+}
 
-	const FVector EndLocation = ShootLocation + EndDistance + TraceLocationX + TraceLocationY;
+void AShootPlayerInventoryActor::TransformWidgetToShootPoint(const float DeltaSeconds, const FVector ShootLocation) {
+	FViewmodelVector ViewmodelShootPoint;
+	ViewmodelShootPoint.Vector = ShootLocation;
+	ViewmodelShootPoint.ViewmodelData = GetViewmodelData();
 
-	FCollisionQueryParams Params;
-	Params.bFindInitialOverlaps = false;
-	Params.bReturnFaceIndex = false;
-	Params.bReturnPhysicalMaterial = false;
-	Params.bTraceComplex = true;
-	Params.bIgnoreTouches = true;
-	
-	return GetWorld()->LineTraceSingleByChannel(OutHit, ShootLocation, EndLocation, ECC_Visibility, Params);
+	FHitResult HitResult;
+	const bool bHit = TraceShot(HitResult, ViewmodelShootPoint, 0.f, 0.f);
+	const FVector TargetLocation = bHit ? HitResult.Location : ShootLocation + GetMesh()->GetForwardVector() * Range;
+
+	FVector2D TargetTranslation;
+	if (UGameplayStatics::ProjectWorldToScreen(PLAYER->GetPlayerController(), TargetLocation, TargetTranslation, true)) {
+		if (ShootWidgetTranslation.IsZero()) {
+			ShootWidgetTranslation = TargetTranslation;
+		}
+
+		ShootWidgetTranslation = FMath::Vector2DInterpTo(ShootWidgetTranslation, TargetTranslation, DeltaSeconds, 35.f);
+		
+		GetShootWidget()->TransformWidgetToShootPoint(ShootWidgetTranslation);
+	}
 }

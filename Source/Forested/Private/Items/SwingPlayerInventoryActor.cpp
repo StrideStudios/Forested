@@ -85,8 +85,8 @@ bool ASwingPlayerInventoryActor::CanMontagePlay_Implementation(const UAnimMontag
 	return !IsSwinging() && CanSwing();
 }
 
-bool ASwingPlayerInventoryActor::Swing(UAnimMontage* Montage, const FAlphaBlend& InHitBlend, const float InHitDelay, const float PlayRate, const float StartingPosition, const bool bStacked) {
-	if (bStacked ? StartStackedMontage(Montage, PlayRate, StartingPosition) : StartMontage(Montage, PlayRate, StartingPosition)) {
+bool ASwingPlayerInventoryActor::Swing(UAnimMontage* Montage, const FAlphaBlend& InHitBlend, const float InHitDelay, const float PlayRate, const float StartingPosition) {
+	if (StartMontage(Montage, PlayRate, StartingPosition)) {
 		SwingMontage = Montage;
 		HitBlend = InHitBlend;
 		HitDelay = InHitDelay;

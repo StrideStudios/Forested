@@ -60,12 +60,6 @@ bool APlayerInventoryActor::StartMontage(UAnimMontage* MontageToPlay, const floa
 	return f > 0.f;
 }
 
-bool APlayerInventoryActor::StartStackedMontage(UAnimMontage* MontageToPlay, const float PlayRate, const float StartingPosition) const {
-	if (!bAnimationsLoaded || !MontageToPlay || !CanMontagePlay(MontageToPlay, PlayRate, StartingPosition)) return false;
-	const float f = GetPlayerAnimInstance()->Montage_Play(MontageToPlay, PlayRate, EMontagePlayReturnType::MontageLength, StartingPosition, false);
-	return f > 0.f;
-}
-
 bool APlayerInventoryActor::PauseMontage(const UAnimMontage* Montage) const {
 	if (!bAnimationsLoaded) return false;
 	FAnimMontageInstance* ActiveMontage = GetPlayerAnimInstance()->GetMontageInstance(Montage, true); 
