@@ -51,10 +51,7 @@ public:
 	}
 	
 	virtual UInputComponent* CreatePlayerInputComponent() override;
-
-	UFUNCTION(BlueprintImplementableEvent, Category = "Player")
-	bool HandleMenuPressed();
-
+	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Player")
 	APlayerController* GetPlayerController() const;
 

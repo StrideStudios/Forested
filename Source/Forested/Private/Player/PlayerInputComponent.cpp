@@ -314,7 +314,7 @@ void UPlayerInputComponent::SetItem(const FInputActionValue& Value) {
 }
 
 void UPlayerInputComponent::MenuPressed(const FInputActionValue& Value) {
-	if (!FORESTED_GAME_MODE->IsGameStarted() || Player->HandleMenuPressed()) return;
+	if (!FORESTED_GAME_MODE->IsGameStarted()) return;
 	if (Player->GetHud()->IsInMenu()) {
 		FORESTED_GAME_MODE->ResumeGame();
 		return;

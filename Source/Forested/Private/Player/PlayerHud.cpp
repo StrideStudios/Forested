@@ -51,23 +51,7 @@ void UInventoryWidget::RunInventoryAnimation() {
 
 FReply UMenuWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) {
 	if (InKeyEvent.GetKey() == EKeys::Escape) {
-		GetWidgetPlayer()->SetGameFocus();
-		SetVisibility(ESlateVisibility::HitTestInvisible);
-		return FReply::Handled();
-	}
-	return Super::NativeOnKeyDown(InGeometry, InKeyEvent);
-}
-
-void UPlayerHud::NativeConstruct() {
-	Super::NativeConstruct();
-
-	SetMenuHud();
-}
-
-
-FReply UPlayerHud::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) {
-	if (InKeyEvent.GetKey() == EKeys::Escape && IsInMenu()) {
-		SetGameHud();
+		FORESTED_GAME_MODE->ResumeGame();
 		return FReply::Handled();
 	}
 	return Super::NativeOnKeyDown(InGeometry, InKeyEvent);

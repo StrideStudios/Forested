@@ -58,11 +58,7 @@ class FORESTED_API UPlayerHud : public UPlayerWidget {
 	GENERATED_BODY()
 
 public:
-
-	virtual void NativeConstruct() override;
-
-	virtual FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
-
+	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Widget")
 	FORCEINLINE UInventoryWidget* GetInventoryWidget() const { return InventoryWidget; }
 

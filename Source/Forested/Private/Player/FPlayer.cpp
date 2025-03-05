@@ -61,6 +61,7 @@ void AFPlayer::BeginPlay() {
 	if (!PlayerHudClass.IsNull()) {
 		FSerializationLibrary::LoadSync(PlayerHudClass);
 		PlayerHud = CreateWidget<UPlayerHud>(GetPlayerController(), PlayerHudClass.Get());
+		PlayerHud->SetMenuHud();
 
 		PlayerHud->AddToViewport();
 	}
