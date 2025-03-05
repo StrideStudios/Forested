@@ -8,6 +8,7 @@
 #include "Engine/AssetManager.h"
 #include "Engine/StreamableManager.h"
 #include "Items/Inventory.h"
+#include "Player/PlayerHud.h"
 #include "Tree/TreeActor.h"
 #include "Serialization/SerializationLibrary.h"
 #include "Player/ViewmodelMeshes.h"
@@ -104,9 +105,9 @@ void UPlayerInventory::ButtonInteract() const {
 void UPlayerInventory::SetSelectedSlot_Internal(const int Slot) {
 	if (const UPlayerAnimInstance* PlayerAnimInstance = Cast<UPlayerAnimInstance>(Player->GetMesh()->GetAnimInstance())) {
 		if (!PlayerAnimInstance->CanSwitchItems()) return;
-		if (Player->PlayerHud && !Player->IsInMenu()) {
-			Player->PlayerHud->SetSlotSelected(SelectedSlot, false);
-			Player->PlayerHud->SetSlotSelected(Slot, true);
+		if (Player->GetHud() && !Player->GetHud()->IsInMenu()) {
+			Player->GetHud()->GetInventoryWidget()->SetSlotSelected(SelectedSlot, false);
+			Player->GetHud()->GetInventoryWidget()->SetSlotSelected(Slot, true);
 		}
 		SelectedSlot = FMath::Clamp(Slot, 0, GetCapacity());
 	}
@@ -147,8 +148,8 @@ void UPlayerInventory::OnInsertItem(const FItemHeap Item, const int Slot) {
 	if (GetSelectedSlot() != Slot) {
 		SetSelectedSlot_Internal(Slot);
 	}
-	if (Player->PlayerHud && !Player->IsInMenu()) {
-		Player->PlayerHud->UpdateSlot(Slot);
+	if (Player->GetHud() && !Player->GetHud()->IsInMenu()) {
+		Player->GetHud()->GetInventoryWidget()->UpdateSlot(Slot);
 	}
 	RegisterItem();
 
@@ -163,8 +164,8 @@ void UPlayerInventory::OnRemoveItem(const FItemHeap Item, const int Slot) {
 		RegisterItem();
 	}
 
-	if (Player->PlayerHud && !Player->IsInMenu()) {
-		Player->PlayerHud->UpdateSlot(Slot);
+	if (Player->GetHud() && !Player->GetHud()->IsInMenu()) {
+		Player->GetHud()->GetInventoryWidget()->UpdateSlot(Slot);
 	}
 	
 	Super::OnRemoveItem(Item, Slot);
@@ -176,8 +177,8 @@ void UPlayerInventory::OnAppendItems(const TMap<int32, FItemHeap>& AppendedItems
 
 	for (auto& Pair : AppendedItems) {
 		//update slot of the appended items
-		if (Player->PlayerHud && !Player->IsInMenu()) {
-			Player->PlayerHud->UpdateSlot(Pair.Key);
+		if (Player->GetHud() && !Player->GetHud()->IsInMenu()) {
+			Player->GetHud()->GetInventoryWidget()->UpdateSlot(Pair.Key);
 		}
 		//tell the item it has been added to the player's inventory
 		IPlayerInventoryInterface::Execute_OnAddedToPlayerInventory(Pair.Value, this);

@@ -6,6 +6,9 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "FPlayer.generated.h"
 
+class UPlayerHud;
+class UInventoryWidget;
+class UMenuWidget;
 class UWidget;
 class UPlayerHud;
 class UPlayerAnimInstance;
@@ -30,6 +33,7 @@ public:
 	AFPlayer(const FObjectInitializer& ObjectInitializer);
 
 protected:
+	
 	virtual void BeginPlay() override;
 
 public:
@@ -53,9 +57,12 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Player")
 	APlayerController* GetPlayerController() const;
-	
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Player")
-	FORCEINLINE bool IsGameStarted() const { return bIsGameStarted; }
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Player Hud")
+	TSoftClassPtr<UPlayerHud> GetHudClass() const { return PlayerHudClass; }
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Player Hud")
+	UPlayerHud* GetHud() const { return PlayerHud; }
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Player")
 	FORCEINLINE FHitResult GetHoveredHitResult() const { return HoverHitResult; }
@@ -74,7 +81,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Player")
 	FORCEINLINE bool IsActorLoaded(AActor* Actor) const { return LoadedActors.Contains(Actor); }
-
+	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Player|Health")
 	FORCEINLINE float GetHealth() const { return Health; }
 	
@@ -130,40 +137,15 @@ public:
 	void InterpolatePlayerTo(const FTransform& Transform, const float Time = 1.f, const TEnumAsByte<EEasingFunc::Type> EasingFunc = EEasingFunc::EaseInOut, TFunction<void(AFPlayer*)> OnUpdate = {}, TFunction<void(AFPlayer*)> OnComplete = {}) {
 		InterpolatePlayerTo_Internal(Transform, Time, EasingFunc, FInterpolatePlayerDelegate::CreateLambda(OnUpdate), FInterpolatePlayerDelegate::CreateLambda(OnComplete));
 	}
-
-	/*
-	 * Hud Functions
-	 */
-
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Player")
-	virtual bool IsInMenu() const;
-
-	UFUNCTION(BlueprintCallable, Category = "Player")
-	virtual void StartGame();
-
-	UFUNCTION(BlueprintCallable, Category = "Player")
-	virtual void ResumeGame() const;
-
-	UFUNCTION(BlueprintCallable, Category = "Player")
-	virtual void PauseGame() const;
-
-	UFUNCTION(BlueprintCallable, Category = "Player")
-	virtual void QuitGame() const;
-
-	UFUNCTION(BlueprintCallable, Category = "Player")
-	UPlayerHud* GetHud() const;
-	
-	UFUNCTION(BlueprintCallable, Category = "Player")
-	void ShowHud() const;
-	
-	UFUNCTION(BlueprintCallable, Category = "Player")
-	void HideHud() const;
 	
 	UPROPERTY(BlueprintAssignable, Category = "Player|Health")
 	FOnHealthUpdate OnHealthUpdate;
 
 	UPROPERTY(BlueprintAssignable, Category = "Player|Money")
 	FOnMoneyUpdate OnMoneyUpdate;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UPlayerHud* PlayerHudComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UPlayerInputComponent* PlayerInputComponent;
@@ -220,7 +202,7 @@ private:
 	void OnActorRemoved(AActor* Actor);
 
 	UPROPERTY()
-	UPlayerHud* PlayerHud;
+	UPlayerHud* PlayerHud = nullptr;
 	
 	UPROPERTY()
 	TArray<AActor*> LoadedActors;
@@ -229,8 +211,6 @@ private:
 	TArray<AActor*> LoadedTickingActors;
 
 	FHitResult HoverHitResult;
-
-	bool bIsGameStarted = false;
 	
 };
 

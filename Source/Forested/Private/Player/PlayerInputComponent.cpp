@@ -11,6 +11,7 @@
 #include "GameFramework/PhysicsVolume.h"
 #include "Player/PlayerInventory.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Player/PlayerHud.h"
 
 UPlayerInputComponent::UPlayerInputComponent() {
 	PrimaryComponentTick.bCanEverTick = true;
@@ -313,12 +314,12 @@ void UPlayerInputComponent::SetItem(const FInputActionValue& Value) {
 }
 
 void UPlayerInputComponent::MenuPressed(const FInputActionValue& Value) {
-	if (!Player->IsGameStarted() || Player->HandleMenuPressed()) return;
-	if (Player->IsInMenu()) {
-		Player->ResumeGame();
+	if (!FORESTED_GAME_MODE->IsGameStarted() || Player->HandleMenuPressed()) return;
+	if (Player->GetHud()->IsInMenu()) {
+		FORESTED_GAME_MODE->ResumeGame();
 		return;
 	}
-	Player->PauseGame();
+	FORESTED_GAME_MODE->PauseGame();
 }
 
 UPlayerMovementComponent::UPlayerMovementComponent() {

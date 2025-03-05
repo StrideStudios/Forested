@@ -6,6 +6,7 @@
 #include "GameFramework/GameStateBase.h"
 #include "GameFramework/PlayerInput.h"
 #include "Kismet/GameplayStatics.h"
+#include "Player/PlayerHud.h"
 
 AForestedGameMode::AForestedGameMode() {
 	PlayerControllerClass = AForestedPlayerController::StaticClass();
@@ -34,6 +35,33 @@ void AForestedGameMode::StartPlay() {
 	LOG("Loading Complete, Starting Game");
 	Super::StartPlay();
 	bGameInitialized = true;
+}
+
+void AForestedGameMode::EndPlay(const EEndPlayReason::Type EndPlayReason) {
+	Super::EndPlay(EndPlayReason);
+	ULevelDefaults::EndPlay();
+	
+	//Forested Game Mode is persistent so variables need to be reset
+	ObjectSaveGame = nullptr;
+	bGameInitialized = false;
+	bIsSaving = false;
+}
+
+void AForestedGameMode::StartGame() {
+	bIsGameStarted = true;
+	PLAYER->GetHud()->SetGameHud();
+}
+
+void AForestedGameMode::ResumeGame() const {
+	PLAYER->GetHud()->SetGameHud();
+}
+
+void AForestedGameMode::PauseGame() const {
+	PLAYER->GetHud()->SetMenuHud();
+}
+
+void AForestedGameMode::QuitGame() const {
+	UKismetSystemLibrary::QuitGame(this, PLAYER->GetPlayerController(), EQuitPreference::Quit, false);
 }
 
 void AForestedGameMode::InitSaveGame() {
@@ -98,16 +126,6 @@ void AForestedGameMode::LoadDefaults() const {
 			continue;
 		ISaveInterface::Execute_LoadDefaults(Object, GetWorld());
 	}
-}
-
-void AForestedGameMode::EndPlay(const EEndPlayReason::Type EndPlayReason) {
-	Super::EndPlay(EndPlayReason);
-	ULevelDefaults::EndPlay();
-	
-	//Forested Game Mode is persistent so variables need to be reset
-	ObjectSaveGame = nullptr;
-	bGameInitialized = false;
-	bIsSaving = false;
 }
 
 bool AForestedGameMode::HasSaveData() const {

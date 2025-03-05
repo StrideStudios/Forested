@@ -40,7 +40,7 @@ protected:
 	UMailboxWidget* MailboxWidget;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, NoClear, Category = "Widget")
-	TSubclassOf<UMailboxWidget> WidgetClass;
+	TSoftClassPtr<UMailboxWidget> WidgetClass;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UStaticMeshComponent* StaticMeshComponent;

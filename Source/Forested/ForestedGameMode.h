@@ -16,6 +16,26 @@ public:
 
 	virtual void StartPlay() override;
 
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Forested")
+	FORCEINLINE bool IsGameStarted() const { return bIsGameStarted; }
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Forested")
+	FORCEINLINE bool IsGameInitialized() const { return bGameInitialized; }
+	
+	UFUNCTION(BlueprintCallable, Category = "Forested")
+	virtual void StartGame();
+
+	UFUNCTION(BlueprintCallable, Category = "Forested")
+	virtual void ResumeGame() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Forested")
+	virtual void PauseGame() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Forested")
+	virtual void QuitGame() const;
+	
 	void InitSaveGame();
 
 	void InitObjects() const;
@@ -24,13 +44,8 @@ public:
 
 	void LoadDefaults() const;
 	
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Loading")
 	bool HasSaveData() const;
-	
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Loading")
-	FORCEINLINE bool IsGameInitialized() const { return bGameInitialized; }
 	
 	UFUNCTION(BlueprintCallable)
 	void SaveGame();
@@ -50,6 +65,8 @@ public:
 private:
 
 	bool bGameInitialized = false;
+
+	bool bIsGameStarted = false;
 
 	bool bIsSaving = false;
 };

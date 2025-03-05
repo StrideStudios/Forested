@@ -2,6 +2,7 @@
 #include "Player/FPlayer.h"
 #include "Widget/PlayerWidget.h"
 #include "Components/BoxComponent.h"
+#include "Serialization/SerializationLibrary.h"
 
 AMailbox::AMailbox() {
 	PrimaryActorTick.bCanEverTick = false;
@@ -20,7 +21,10 @@ void AMailbox::BeginPlay() {
 }
 
 bool AMailbox::Selected_Implementation(AFPlayer* Player, const FHitResult& HitResult, const float HeldTime) {
-	MailboxWidget = UPlayerWidget::CreatePlayerWidget<UMailboxWidget>(Player, WidgetClass);
+	if (WidgetClass.IsNull()) return false;
+	FSerializationLibrary::LoadSync(WidgetClass);
+	MailboxWidget = CreateWidget<UMailboxWidget>(Player->GetPlayerController(), WidgetClass.Get());
+	MailboxWidget->AddToViewport(1);
 	MailboxWidget->ActivateMailboxWidget(this);
 	return true;
 }

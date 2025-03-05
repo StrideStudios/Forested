@@ -8,6 +8,7 @@
 #include "Components/ExponentialHeightFogComponent.h"
 #include "Components/SkyAtmosphereComponent.h"
 #include "Components/SkyLightComponent.h"
+#include "Forested/ForestedGameMode.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Materials/MaterialParameterCollection.h"
 #include "Materials/MaterialParameterCollectionInstance.h"
@@ -78,7 +79,7 @@ float ASky::GetSeasonTime() const {
 
 void ASky::Tick(const float DeltaTime){
 	Super::Tick(DeltaTime);
-	if (!PLAYER || !PLAYER->IsGameStarted()) return;
+	if (!FORESTED_GAME_MODE || !FORESTED_GAME_MODE->IsGameStarted()) return;
 	const double TimeLerp = UKismetMathLibrary::MapRangeClamped(GetSunHeight(), -0.1f, -0.05f, 0.f, 1.f);
 	const double TimeToAdd = DeltaTime * (1.f / (2.f * FMath::Lerp(NightTimeSpeedInSecondsPerNight, DayTimeSpeedInSecondsPerDay, TimeLerp)));
 	Time += TimeToAdd;

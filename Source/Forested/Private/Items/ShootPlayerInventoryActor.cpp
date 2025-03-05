@@ -1,10 +1,11 @@
 #include "Items/ShootPlayerInventoryActor.h"
-
 #include "NiagaraFunctionLibrary.h"
 #include "Interfaces/DamageableInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/FPlayer.h"
+#include "Player/PlayerHud.h"
 #include "Player/PlayerInventory.h"
+#include "Serialization/SerializationLibrary.h"
 
 AShootPlayerInventoryActor::AShootPlayerInventoryActor() {
 	PrimaryActorTick.bCanEverTick = true;
@@ -13,9 +14,10 @@ AShootPlayerInventoryActor::AShootPlayerInventoryActor() {
 
 void AShootPlayerInventoryActor::Init() {
 	Super::Init();
-	if (!WidgetClass) return;
-	ShootWidget = NewObject<UShootWidget>(GetWorld(), WidgetClass);
-	ShootWidget->AddToViewport();
+	if (WidgetClass.IsNull()) return;
+	FSerializationLibrary::LoadSync(WidgetClass);
+	ShootWidget = CreateWidget<UShootWidget>(PLAYER->GetPlayerController(), WidgetClass.Get());
+	ShootWidget->AddToViewport(-1);
 }
 
 void AShootPlayerInventoryActor::Deinit() {
@@ -123,7 +125,8 @@ void AShootPlayerInventoryActor::TransformWidgetToShootPoint(const float DeltaSe
 		}
 
 		ShootWidgetTranslation = FMath::Vector2DInterpTo(ShootWidgetTranslation, TargetTranslation, DeltaSeconds, 35.f);
-		
-		GetShootWidget()->TransformWidgetToShootPoint(ShootWidgetTranslation);
+
+		if (ShootWidget)
+			ShootWidget->TransformWidgetToShootPoint(ShootWidgetTranslation);
 	}
 }

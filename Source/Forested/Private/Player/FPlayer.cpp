@@ -12,10 +12,11 @@
 #include "Sky.h"
 #include "Player/ViewmodelMeshes.h"
 #include "Components/SphereComponent.h"
+#include "Player/PlayerHud.h"
 
 AFPlayer::AFPlayer(const FObjectInitializer& ObjectInitializer): Super(ObjectInitializer
-	.SetDefaultSubobjectClass<UPlayerMovementComponent>(CharacterMovementComponentName)
-	.SetDefaultSubobjectClass<UViewmodelSkeletalMeshComponent>(MeshComponentName)) {
+                                                                       .SetDefaultSubobjectClass<UPlayerMovementComponent>(CharacterMovementComponentName)
+                                                                       .SetDefaultSubobjectClass<UViewmodelSkeletalMeshComponent>(MeshComponentName)) {
 	
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
@@ -45,6 +46,7 @@ AFPlayer::AFPlayer(const FObjectInitializer& ObjectInitializer): Super(ObjectIni
 	WaistPoint->SetupAttachment(GetCapsuleComponent());
 	WaistPoint->SetRelativeLocation(Camera->GetRelativeLocation() - FVector(0.0, 0.0, 15.0));
 
+	PlayerHudComponent = CreateDefaultSubobject<UPlayerHud>(TEXT("Player Hud Component"));
 	PlayerInputComponent = CreateDefaultSubobject<UPlayerInputComponent>(TEXT("Player Input Component"));
 	PlayerInventory = CreateDefaultSubobject<UPlayerInventory>(TEXT("Inventory"));
 }
@@ -54,20 +56,15 @@ void AFPlayer::BeginPlay() {
 
 	//make sure we attach the camera
 	Camera->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, "Camera");
-	
-	//assert that the hud class is valid
-	check(!PlayerHudClass.IsNull());
-	
-	FSerializationLibrary::LoadSync(PlayerHudClass);
-	PlayerHud = UPlayerWidget::CreatePlayerWidget<UPlayerHud>(this, PlayerHudClass.Get());
 
-	//assert the hud was created
-	check(PlayerHud);
-	
-	for (int i = 0; i < PlayerInventory->GetCapacity(); ++i) {
-		PlayerHud->UpdateSlot(i);
+	//load widget class and create widget
+	if (!PlayerHudClass.IsNull()) {
+		FSerializationLibrary::LoadSync(PlayerHudClass);
+		PlayerHud = CreateWidget<UPlayerHud>(GetPlayerController(), PlayerHudClass.Get());
+
+		PlayerHud->AddToViewport();
 	}
-
+	
 	//add on destroy listeners for all current actors in the world
 	for (TActorIterator<AActor> It(GetWorld()); It; ++It) {
 		AddOnDestroyedListener(*It);
@@ -76,7 +73,6 @@ void AFPlayer::BeginPlay() {
 	//each actor spawned will have an on destroyed listener added
 	GetWorld()->AddOnActorSpawnedHandler(FOnActorSpawned::FDelegate::CreateUObject(this, &AFPlayer::OnActorSpawned));
 	
-	PlayerHud->SetSlotSelected(PlayerInventory->GetSelectedSlot(), true);
 	LoadMesh->OnComponentBeginOverlap.AddUniqueDynamic(this, &AFPlayer::LoadMeshOverlap);
 	LoadMesh->OnComponentEndOverlap.AddUniqueDynamic(this, &AFPlayer::LoadMeshEndOverlap);
 }
@@ -136,7 +132,6 @@ bool AFPlayer::IsInputAllowed() const {
 	return !GetWorld()->GetGameViewport()->IgnoreInput();
 }
 
-//WORKS ON FIRST, NOT AFTER
 void AFPlayer::SetGameFocus() const {
 	APlayerController* PlayerController = GetPlayerController();
 	PlayerController->SetShowMouseCursor(false);
@@ -233,40 +228,6 @@ void AFPlayer::OnActorSpawned(AActor* Actor) {
 void AFPlayer::OnActorRemoved(AActor* Actor) {
 	if (LoadedActors.Contains(Actor))
 		LoadedActors.Remove(Actor);
-}
-
-bool AFPlayer::IsInMenu() const {
-	return PlayerHud->IsInMenu();
-}
-
-void AFPlayer::StartGame() {
-	bIsGameStarted = true;
-	PlayerHud->SetGameHud();
-}
-
-void AFPlayer::ResumeGame() const {
-	PlayerHud->SetGameHud();
-}
-
-void AFPlayer::PauseGame() const {
-	PlayerHud->SetMenuHud();
-}
-
-void AFPlayer::QuitGame() const {
-	APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
-	UKismetSystemLibrary::QuitGame(this, PlayerController, EQuitPreference::Quit, false);
-}
-
-UPlayerHud* AFPlayer::GetHud() const {
-	return PlayerHud;
-}
-
-void AFPlayer::ShowHud() const {
-	PlayerHud->SetWidgetVisible();
-}
-
-void AFPlayer::HideHud() const {
-	PlayerHud->SetWidgetCollapsed();
 }
 
 UInterpolatePlayerAsyncAction* UInterpolatePlayerAsyncAction::InterpolatePlayerTo(AFPlayer* Player, const FTransform Transform, const float Time, const TEnumAsByte<EEasingFunc::Type> EasingFunc) {

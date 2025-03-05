@@ -30,7 +30,7 @@ public:
 	FORCEINLINE UNiagaraSystem* GetHitNiagaraSystem() const { return HitNiagaraSystem; }
 
 	UFUNCTION(BlueprintCallable, Category = "Shoot Player Inventory Actor")
-	FORCEINLINE TSubclassOf<UShootWidget> GetWidgetClass() const { return WidgetClass; }
+	FORCEINLINE TSoftClassPtr<UShootWidget> GetWidgetClass() const { return WidgetClass; }
 
 	UFUNCTION(BlueprintCallable, Category = "Shoot Player Inventory Actor")
 	FORCEINLINE UShootWidget* GetShootWidget() const { return ShootWidget; }
@@ -95,7 +95,7 @@ private:
 	UNiagaraSystem* HitNiagaraSystem = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Shooting")
-	TSubclassOf<UShootWidget> WidgetClass = nullptr;
+	TSoftClassPtr<UShootWidget> WidgetClass = nullptr;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Shooting")
 	int AmountOfProjectiles = 1;
