@@ -53,6 +53,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Shoot Player Inventory Actor")
 	FORCEINLINE FVector2D GetLeanIntensity() const { return LeanIntensity; }
 
+	UFUNCTION(BlueprintCallable, Category = "Shoot Player Inventory Actor")
+	FORCEINLINE int GetBullets() const { return Bullets; }
+
+	UFUNCTION(BlueprintCallable, Category = "Shoot Player Inventory Actor")
+	FORCEINLINE int GetMaxBullets() const { return MaxBullets; }
+
 	/**
 	 * Blueprint Functions
 	 */
@@ -62,6 +68,9 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category = "Shoot Player Inventory Actor")
 	bool Shoot(UAnimMontage* Montage, FViewmodelVector ShootLocation, float PlayRate = 1.f, float StartingPosition = 0.f, bool Aimed = false);
+	
+	UFUNCTION(BlueprintCallable, Category = "Shoot Player Inventory Actor")
+	bool Reload(UAnimMontage* Montage, float PlayRate = 1.f, float StartingPosition = 0.f, bool FullReload = true, int BulletsToAdd = 0);
 	
 	UFUNCTION(BlueprintCallable, Category = "Shoot Player Inventory Actor")
 	bool Aim(UAnimMontage* Montage, float PlayRate = 1.f, float StartingPosition = 0.f);
@@ -84,7 +93,7 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Shoot Player Inventory Actor")
 	void EndShot();
-	
+
 private:
 
 	/*
@@ -115,6 +124,11 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Shooting")
 	FVector2D LeanIntensity = FVector2D(0.25f, 0.3f);
 
+	int Bullets = 0;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Reloading")
+	int MaxBullets = 10;
+
 	UPROPERTY()
 	UShootWidget* ShootWidget;
 	
@@ -122,6 +136,7 @@ private:
 	UAnimMontage* ShootMontage;
 
 	FVector2D ShootWidgetTranslation;
+
 };
 
 UCLASS(Blueprintable)

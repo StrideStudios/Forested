@@ -85,6 +85,10 @@ public:
 	virtual void OnRightEndInteract();
 
 	virtual void OnButtonInteract();
+	
+	virtual void OnReload();
+	
+	virtual void OnEndReload();
 
 	virtual void OnManualBlendOutMontageComplete(const UAnimMontage* Montage) {
 		ReceiveOnManualBlendOutMontageComplete(Montage);
@@ -177,6 +181,12 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent, DisplayName = "On Button Interact", Category = "Inventory Render Actor|Player")
 	void ReceiveOnButtonInteract(bool IsMontagePlaying);
 
+	UFUNCTION(BlueprintImplementableEvent, DisplayName = "On Reload", Category = "Inventory Render Actor|Player")
+	void ReceiveOnReload(bool IsMontagePlaying);
+
+	UFUNCTION(BlueprintImplementableEvent, DisplayName = "On End Reload", Category = "Inventory Render Actor|Player")
+	void ReceiveOnEndReload(bool IsMontagePlaying);
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Render")
 	FName AttachSocket = "Socket_R_Default";
 

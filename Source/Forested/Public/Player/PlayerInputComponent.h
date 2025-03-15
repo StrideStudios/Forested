@@ -52,6 +52,9 @@ public:
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Player Input Component")
 	FORCEINLINE bool IsHoldingRightInteract() const { return bHoldingRightInteract; }
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Player Input Component")
+	FORCEINLINE bool IsHoldingReload() const { return bHoldingReload; }
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Player Input Component")
 	FORCEINLINE bool IsInWater() const { return bInWater; }
@@ -116,6 +119,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input|Actions")
 	UInputAction* JumpAction = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input|Actions")
+	UInputAction* ReloadAction = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Movement")
 	float MaxSelectDistance = 10000.f;
@@ -186,6 +192,10 @@ private:
 	void SetItem(const FInputActionValue& Value);
 
 	void MenuPressed(const FInputActionValue& Value);
+	
+	void Reload(const FInputActionValue& Value);
+	
+	void EndReload(const FInputActionValue& Value);
 
 	UPROPERTY()
 	AFPlayer* Player = nullptr;
@@ -212,6 +222,8 @@ private:
 	bool bHoldingLeftInteract = false;
 	
 	bool bHoldingRightInteract = false;
+	
+	bool bHoldingReload = false;
 
 	bool bIsAboveWater = true;
 	

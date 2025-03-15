@@ -116,6 +116,14 @@ void APlayerInventoryActor::OnButtonInteract() {
 	ReceiveOnButtonInteract(GetPlayerAnimInstance()->IsAMontageActive());
 }
 
+void APlayerInventoryActor::OnReload() {
+	ReceiveOnReload(GetPlayerAnimInstance()->IsAMontageActive());
+}
+
+void APlayerInventoryActor::OnEndReload() {
+	ReceiveOnEndReload(GetPlayerAnimInstance()->IsAMontageActive());
+}
+
 bool APlayerInventoryActor::HasItem() {
 	return PLAYER_INVENTORY->HasSelectedItem();
 }

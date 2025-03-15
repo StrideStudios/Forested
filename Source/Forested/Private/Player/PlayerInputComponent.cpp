@@ -52,6 +52,9 @@ void UPlayerInputComponent::BeginPlay() {
 	BindAction(SetItemAction, ETriggerEvent::Started, this, &UPlayerInputComponent::SetItem);
 	
 	BindAction(MenuAction, ETriggerEvent::Started, this, &UPlayerInputComponent::MenuPressed);
+
+	BindAction(ReloadAction, ETriggerEvent::Triggered, this, &UPlayerInputComponent::Reload);
+	BindAction(ReloadAction, ETriggerEvent::Completed, this, &UPlayerInputComponent::EndReload);
 	
 	LOG("Player Input Initialized");
 }
@@ -321,6 +324,24 @@ void UPlayerInputComponent::MenuPressed(const FInputActionValue& Value) {
 	}
 	FORESTED_GAME_MODE->PauseGame();
 }
+
+void UPlayerInputComponent::Reload(const FInputActionValue& Value) {
+	if (!Player->PlayerInventory) return;
+	if (bHoldingReload && (bSwimming || bInDeepWater)) {
+		Player->PlayerInventory->EndReload();
+		bHoldingReload = false;
+		return;
+	}
+	Player->PlayerInventory->Reload();
+	bHoldingReload = true;
+}
+
+void UPlayerInputComponent::EndReload(const FInputActionValue& Value) {
+	if (bSwimming || bInDeepWater || !Player->PlayerInventory) return;
+	Player->PlayerInventory->EndReload();
+	bHoldingReload = false;
+}
+
 
 UPlayerMovementComponent::UPlayerMovementComponent() {
 	NavAgentProps.bCanSwim = true;

@@ -58,7 +58,10 @@ bool AShootPlayerInventoryActor::TraceShot(FHitResult& OutHit, const FVector Sho
 }
 
 bool AShootPlayerInventoryActor::Shoot(UAnimMontage* Montage, const FViewmodelVector ShootLocation, const float PlayRate, const float StartingPosition, const bool Aimed) {
+	if (Bullets <= 0) return false;
 	if (StartMontage(Montage, PlayRate, StartingPosition)) {
+		Bullets--;
+		
 		ShootMontage = Montage;
 		
 		PLAYER->AddControllerPitchInput(-0.1f);
@@ -83,6 +86,21 @@ bool AShootPlayerInventoryActor::Shoot(UAnimMontage* Montage, const FViewmodelVe
 	}
 	return false;
 }
+
+bool AShootPlayerInventoryActor::Reload(UAnimMontage* Montage, const float PlayRate, const float StartingPosition, const bool FullReload, const int BulletsToAdd) {
+	if (Bullets >= MaxBullets) return false;
+	if (StartMontage(Montage, PlayRate, StartingPosition)) {
+		if (FullReload) {
+			Bullets = MaxBullets;
+		} else {
+			Bullets += BulletsToAdd;
+			Bullets = FMath::Min(Bullets, MaxBullets);
+		}
+		return true;
+	}
+	return false;
+}
+
 
 bool AShootPlayerInventoryActor::Aim(UAnimMontage* Montage, const float PlayRate, const float StartingPosition) {
 	if (StartMontage(Montage, PlayRate, StartingPosition)) {

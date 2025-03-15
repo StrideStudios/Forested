@@ -33,19 +33,19 @@ void UPlayerInventory::TickComponent(const float DeltaTime, const ELevelTick Tic
 }
 
 //TODO: can interact while montage playing
-bool UPlayerInventory::ClearSelectedItem() {
+bool UPlayerInventory::ClearSelectedItem(const float PlayRate) {
 	if (const UPlayerAnimInstance* PlayerAnimInstance = Cast<UPlayerAnimInstance>(Player->GetMesh()->GetAnimInstance())) {
 		if (!PlayerAnimInstance->CanSwitchItems()) return false;
 		SelectedSlot -= GetCapacity();
-		RegisterItem();
+		RegisterItem(PlayRate);
 	}
 	return !IsSelectedSlotValid();
 }
 
-bool UPlayerInventory::ResetSelectedItem() {
+bool UPlayerInventory::ResetSelectedItem(const float PlayRate) {
 	if (SelectedSlot < 0) {
 		SelectedSlot += GetCapacity();
-		RegisterItem();
+		RegisterItem(PlayRate);
 	}
 	return IsSelectedSlotValid();
 }
@@ -102,6 +102,18 @@ void UPlayerInventory::ButtonInteract() const {
 	}
 }
 
+void UPlayerInventory::Reload() const {
+	if (APlayerInventoryActor* InventoryRenderActor = Cast<APlayerInventoryActor>(Player->ItemMesh->GetChildActor())) {
+		InventoryRenderActor->OnReload();
+	}
+}
+
+void UPlayerInventory::EndReload() const {
+	if (APlayerInventoryActor* InventoryRenderActor = Cast<APlayerInventoryActor>(Player->ItemMesh->GetChildActor())) {
+		InventoryRenderActor->OnEndReload();
+	}
+}
+
 void UPlayerInventory::SetSelectedSlot_Internal(const int Slot) {
 	if (const UPlayerAnimInstance* PlayerAnimInstance = Cast<UPlayerAnimInstance>(Player->GetMesh()->GetAnimInstance())) {
 		if (!PlayerAnimInstance->CanSwitchItems()) return;
@@ -113,7 +125,7 @@ void UPlayerInventory::SetSelectedSlot_Internal(const int Slot) {
 	}
 }
 
-void UPlayerInventory::RegisterItem() const {
+void UPlayerInventory::RegisterItem(const float PlayRate) const {
 	if (UPlayerAnimInstance* PlayerAnimInstance = Cast<UPlayerAnimInstance>(Player->GetMesh()->GetAnimInstance())) {
 		FItemHeap SelectedItem; 
 		if (IsSelectedSlotValid() && GetSelectedItem(SelectedItem) && SelectedItem) {
@@ -122,11 +134,11 @@ void UPlayerInventory::RegisterItem() const {
 			//TODO: ASSUMING THIS ISNT LOADING PROPERLY UPON NEW GAME (CLOSE AND OPEN EDITOR)
 			//TODO: equipping only on first startup? things not unloading?
 			FSerializationLibrary::LoadSync(InventoryRenderClass); //TODO: Don't load sync forever please
-			PlayerAnimInstance->SetNewInventoryRenderActor(InventoryRenderClass.Get());
+			PlayerAnimInstance->SetNewInventoryRenderActor(InventoryRenderClass.Get(), PlayRate);
 			return;
 		}
 		if (!PlayerAnimInstance->GetInventoryRenderActor() || PlayerAnimInstance->GetInventoryRenderActor()->GetClass() != DefaultInventoryRenderActor) {
-			PlayerAnimInstance->SetNewInventoryRenderActor(DefaultInventoryRenderActor);
+			PlayerAnimInstance->SetNewInventoryRenderActor(DefaultInventoryRenderActor, PlayRate);
 		}
 	}
 }
@@ -263,12 +275,13 @@ bool UPlayerAnimInstance::HandleNotify(const FAnimNotifyEvent& AnimNotifyEvent) 
 	return false;
 }
 
-void UPlayerAnimInstance::SetNewInventoryRenderActor(const TSubclassOf<APlayerInventoryActor>& InRenderActor) {
+void UPlayerAnimInstance::SetNewInventoryRenderActor(const TSubclassOf<APlayerInventoryActor>& InRenderActor, const float PlayRate) {
 	if (!InRenderActor) {
 		LOG_ERROR("Null Render Actor Given To Anim Instance");
 		return;
 	}
 	NextRenderActor = InRenderActor;
+	CurrentPlayRate = PlayRate;
 
 	//if there is no actor equipped or no anim, just load the data
 	if (!RenderActor || !RenderActor->UnEquipAnimMontage) {
@@ -278,7 +291,7 @@ void UPlayerAnimInstance::SetNewInventoryRenderActor(const TSubclassOf<APlayerIn
 
 	//if no montage is active unequip and prepare for loading data
 	if (!IsAMontageActive()) {
-		RenderActor->StartMontage(RenderActor->UnEquipAnimMontage);
+		RenderActor->StartMontage(RenderActor->UnEquipAnimMontage, CurrentPlayRate);
 		return;
 	}
 
@@ -287,7 +300,7 @@ void UPlayerAnimInstance::SetNewInventoryRenderActor(const TSubclassOf<APlayerIn
 	FAnimMontageInstance* EquipMontage = GetActiveMontageInstance(RenderActor->EquipAnimMontage, true);
 	if (EquipMontage && RenderActor->GetClass() != NextRenderActor) {
 		EquipMontage->Stop(Blend);
-		Montage_Play(RenderActor->UnEquipAnimMontage);
+		Montage_Play(RenderActor->UnEquipAnimMontage, CurrentPlayRate);
 		return;
 	}
 	
@@ -295,7 +308,7 @@ void UPlayerAnimInstance::SetNewInventoryRenderActor(const TSubclassOf<APlayerIn
 	FAnimMontageInstance* UnequipMontage = GetActiveMontageInstance(RenderActor->UnEquipAnimMontage, true);
 	if (UnequipMontage && RenderActor->GetClass() == NextRenderActor) {
 		UnequipMontage->Stop(Blend);
-		Montage_Play(RenderActor->EquipAnimMontage);
+		Montage_Play(RenderActor->EquipAnimMontage, CurrentPlayRate);
 	}
 }
 
@@ -332,7 +345,7 @@ void UPlayerAnimInstance::LoadAnimationData() {
 		}
 		
 		if (RenderActor->EquipAnimMontage)
-			RenderActor->StartMontage(RenderActor->EquipAnimMontage);
+			RenderActor->StartMontage(RenderActor->EquipAnimMontage, CurrentPlayRate);
 	}
 }
 

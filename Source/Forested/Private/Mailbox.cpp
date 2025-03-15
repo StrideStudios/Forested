@@ -38,7 +38,7 @@ bool AMailbox::Selected_Implementation(AFPlayer* Player, const FHitResult& HitRe
 	MailboxWidget->AddToViewport(1);
 	MailboxWidget->ActivateMailboxWidget(this);
 
-	if (!Player->PlayerInventory->ClearSelectedItem()) {
+	if (!Player->PlayerInventory->ClearSelectedItem(2.f)) {
 		return false;
 	}
 

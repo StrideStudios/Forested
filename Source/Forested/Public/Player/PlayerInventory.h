@@ -74,11 +74,11 @@ public:
 
 	//used to remove item from hand (and all anims will not play)
 	UFUNCTION(BlueprintCallable, Category = "Player Inventory")
-	bool ClearSelectedItem();
+	bool ClearSelectedItem(float PlayRate = 1.f);
 
 	//resets selected item back to previous value if cleared
 	UFUNCTION(BlueprintCallable, Category = "Player Inventory")
-	bool ResetSelectedItem();
+	bool ResetSelectedItem(float PlayRate = 1.f);
 	
 	//get an item from the inventory
 	FORCEINLINE bool GetSelectedItem(FItemHeap& OutSelectedItem) const {
@@ -103,6 +103,10 @@ public:
 	void EndRightInteract() const;
 
 	void ButtonInteract() const;
+	
+	void Reload() const;
+	
+	void EndReload() const;
 
 private:
 
@@ -113,7 +117,7 @@ private:
 
 	void SetSelectedSlot_Internal(int Slot);
 
-	void RegisterItem() const;
+	void RegisterItem(float PlayRate = 1.f) const;
 
 	/*
 	 * Inventory Overrides
@@ -227,7 +231,7 @@ public:
 
 	virtual bool HandleNotify(const FAnimNotifyEvent& AnimNotifyEvent) override;
 	
-	void SetNewInventoryRenderActor(const TSubclassOf<APlayerInventoryActor>& InRenderActor);
+	void SetNewInventoryRenderActor(const TSubclassOf<APlayerInventoryActor>& InRenderActor, float PlayRate = 1.f);
 
 	void LoadAnimationData();
 
@@ -298,6 +302,8 @@ protected:
 
 	UPROPERTY()
 	TSubclassOf<APlayerInventoryActor> NextRenderActor = nullptr;
+
+	float CurrentPlayRate = 1.f;
 
 private:
 
