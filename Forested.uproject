@@ -380,10 +380,6 @@
 			"Enabled": false
 		},
 		{
-			"Name": "CableComponent",
-			"Enabled": false
-		},
-		{
 			"Name": "ChaosNiagara",
 			"Enabled": false
 		},
@@ -433,6 +429,10 @@
 		{
 			"Name": "BlueprintRetarget",
 			"Enabled": true
+		},
+		{
+			"Name": "CableComponent",
+			"Enabled": false
 		}
 	],
 	"TargetPlatforms": [
