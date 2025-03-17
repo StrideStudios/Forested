@@ -5,6 +5,7 @@
 #include "Widget/PlayerWidget.h"
 #include "ShootPlayerInventoryActor.generated.h"
 
+class UShootItem;
 class UShootWidget;
 class UNiagaraSystem;
 
@@ -16,7 +17,7 @@ public:
 	
 	AShootPlayerInventoryActor();
 
-	virtual void Init() override;
+	virtual void Init(AFPlayer* InPlayer) override;
 
 	virtual void Deinit() override;
 
@@ -52,10 +53,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Shoot Player Inventory Actor")
 	FORCEINLINE FVector2D GetLeanIntensity() const { return LeanIntensity; }
-
-	UFUNCTION(BlueprintCallable, Category = "Shoot Player Inventory Actor")
-	FORCEINLINE int GetBullets() const { return Bullets; }
-
+	
 	UFUNCTION(BlueprintCallable, Category = "Shoot Player Inventory Actor")
 	FORCEINLINE int GetMaxBullets() const { return MaxBullets; }
 
@@ -94,6 +92,11 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Shoot Player Inventory Actor")
 	void EndShot();
 
+protected:
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, meta = (BlueprintProtected), Category = "Inventory Render Actor")
+	bool GetShootItem(UShootItem*& OutItem) const;
+	
 private:
 
 	/*
@@ -123,8 +126,6 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Shooting")
 	FVector2D LeanIntensity = FVector2D(0.25f, 0.3f);
-
-	int Bullets = 0;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Reloading")
 	int MaxBullets = 10;

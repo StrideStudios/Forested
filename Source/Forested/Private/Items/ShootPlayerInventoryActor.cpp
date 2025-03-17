@@ -1,6 +1,7 @@
 #include "Items/ShootPlayerInventoryActor.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Interfaces/DamageableInterface.h"
+#include "Items/ShootItem.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/FPlayer.h"
 #include "Player/PlayerHud.h"
@@ -12,8 +13,8 @@ AShootPlayerInventoryActor::AShootPlayerInventoryActor() {
 	SetTickGroup(TG_PostUpdateWork);
 }
 
-void AShootPlayerInventoryActor::Init() {
-	Super::Init();
+void AShootPlayerInventoryActor::Init(AFPlayer* InPlayer) {
+	Super::Init(InPlayer);
 	if (WidgetClass.IsNull()) return;
 	FSerializationLibrary::LoadSync(WidgetClass);
 	ShootWidget = CreateWidget<UShootWidget>(PLAYER->GetPlayerController(), WidgetClass.Get());
@@ -58,9 +59,11 @@ bool AShootPlayerInventoryActor::TraceShot(FHitResult& OutHit, const FVector Sho
 }
 
 bool AShootPlayerInventoryActor::Shoot(UAnimMontage* Montage, const FViewmodelVector ShootLocation, const float PlayRate, const float StartingPosition, const bool Aimed) {
-	if (Bullets <= 0) return false;
+	UShootItem* ShootItem;
+	if (!GetShootItem(ShootItem)) return false;
+	if (ShootItem->Bullets <= 0) return false;
 	if (StartMontage(Montage, PlayRate, StartingPosition)) {
-		Bullets--;
+		ShootItem->Bullets--;
 		
 		ShootMontage = Montage;
 		
@@ -88,13 +91,15 @@ bool AShootPlayerInventoryActor::Shoot(UAnimMontage* Montage, const FViewmodelVe
 }
 
 bool AShootPlayerInventoryActor::Reload(UAnimMontage* Montage, const float PlayRate, const float StartingPosition, const bool FullReload, const int BulletsToAdd) {
-	if (Bullets >= MaxBullets) return false;
+	UShootItem* ShootItem;
+	if (!GetShootItem(ShootItem)) return false;
+	if (ShootItem->Bullets >= MaxBullets) return false;
 	if (StartMontage(Montage, PlayRate, StartingPosition)) {
 		if (FullReload) {
-			Bullets = MaxBullets;
+			ShootItem->Bullets = MaxBullets;
 		} else {
-			Bullets += BulletsToAdd;
-			Bullets = FMath::Min(Bullets, MaxBullets);
+			ShootItem->Bullets += BulletsToAdd;
+			ShootItem->Bullets = FMath::Min(ShootItem->Bullets, MaxBullets);
 		}
 		return true;
 	}
@@ -147,4 +152,13 @@ void AShootPlayerInventoryActor::TransformWidgetToShootPoint(const float DeltaSe
 		if (ShootWidget)
 			ShootWidget->TransformWidgetToShootPoint(ShootWidgetTranslation);
 	}
+}
+
+bool AShootPlayerInventoryActor::GetShootItem(UShootItem*& OutItem) const {
+	FItemHeap Item;
+	if (GetItem(Item) && Item->IsA(UShootItem::StaticClass())) {
+		OutItem = CastChecked<UShootItem>(Item.Top());
+		return true;
+	}
+	return false;
 }

@@ -5,6 +5,7 @@
 #include "GameFramework/Actor.h"
 #include "PlayerInventoryActor.generated.h"
 
+class UItem;
 class UBlendSpace1D;
 struct FItemHeap;
 struct FAlphaBlend;
@@ -21,7 +22,7 @@ class FORESTED_API APlayerInventoryActor : public AActor {
 public:	
 	APlayerInventoryActor();
 
-	virtual void Init();
+	virtual void Init(AFPlayer* InPlayer);
 	
 	virtual void Deinit();
 	
@@ -143,13 +144,16 @@ protected:
 	void SetupRootAttachment() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, meta = (BlueprintProtected), Category = "Inventory Render Actor")
-	static UPlayerAnimInstance* GetPlayerAnimInstance();
+	FORCEINLINE AFPlayer* GetPlayer() const { return Player; }
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, meta = (BlueprintProtected), Category = "Inventory Render Actor")
-	static bool HasItem();
+	UPlayerAnimInstance* GetPlayerAnimInstance() const;
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure, meta = (BlueprintProtected), Category = "Inventory Render Actor")
+	bool HasItem() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, meta = (BlueprintProtected), Category = "Inventory Render Actor")
-	static bool GetItem(FItemHeap& OutItem);
+	bool GetItem(FItemHeap& OutItem) const;
 	
 	UFUNCTION(BlueprintImplementableEvent, DisplayName = "On Montage Complete", Category = "Inventory Render Actor|Montage")
 	void ReceiveOnMontageComplete(const UAnimMontage* Montage, bool bInterrupted);
@@ -192,5 +196,10 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Animation")
 	bool bAnimationsLoaded = false;
+
+private:
+
+	UPROPERTY()
+	AFPlayer* Player;
 	
 };

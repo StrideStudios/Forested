@@ -337,7 +337,7 @@ void UPlayerAnimInstance::LoadAnimationData() {
 	
 	if (APlayerInventoryActor* ItemRenderActor = Cast<APlayerInventoryActor>(Player->ItemMesh->GetChildActor())) {
 		RenderActor = ItemRenderActor;
-		RenderActor->Init();
+		RenderActor->Init(Player);
 
 		//set the player's mesh to use the fov of the item
 		if (UViewmodelSkeletalMeshComponent* Mesh = Cast<UViewmodelSkeletalMeshComponent>(Player->GetMesh())) {

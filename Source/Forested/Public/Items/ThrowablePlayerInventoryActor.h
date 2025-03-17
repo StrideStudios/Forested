@@ -32,7 +32,7 @@ public:
 	
 	AThrowablePlayerInventoryActor();
 
-	virtual void Init() override;
+	virtual void Init(AFPlayer* InPlayer) override;
 	
 	virtual void InventoryTick(const float DeltaTime) override;
 

@@ -24,8 +24,8 @@ AThrowablePlayerInventoryActor::AThrowablePlayerInventoryActor() {
 	Spline->SetupAttachment(GetRootComponent());
 }
 
-void AThrowablePlayerInventoryActor::Init() {
-	Super::Init();
+void AThrowablePlayerInventoryActor::Init(AFPlayer* InPlayer) {
+	Super::Init(InPlayer);
 	Spline->ClearSplinePoints();
 	Spline->ClearComponents();
 }

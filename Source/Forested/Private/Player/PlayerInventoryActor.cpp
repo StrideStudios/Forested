@@ -16,7 +16,9 @@ APlayerInventoryActor::APlayerInventoryActor() {
 	SetupRootAttachment();
 }
 
-void APlayerInventoryActor::Init() {
+void APlayerInventoryActor::Init(AFPlayer* InPlayer) {
+	Player = InPlayer;
+	
 	SetupRootAttachment();
 	bAnimationsLoaded = true;
 	ReceiveInit();
@@ -49,8 +51,8 @@ void APlayerInventoryActor::SetupRootAttachment() const {
 	}
 }
 
-UPlayerAnimInstance* APlayerInventoryActor::GetPlayerAnimInstance() {
-	return CastChecked<UPlayerAnimInstance>(PLAYER->GetMesh()->GetAnimInstance());
+UPlayerAnimInstance* APlayerInventoryActor::GetPlayerAnimInstance() const {
+	return CastChecked<UPlayerAnimInstance>(Player->GetMesh()->GetAnimInstance());
 }
 
 bool APlayerInventoryActor::StartMontage(UAnimMontage* MontageToPlay, const float PlayRate, const float StartingPosition) const {
@@ -124,10 +126,10 @@ void APlayerInventoryActor::OnEndReload() {
 	ReceiveOnEndReload(GetPlayerAnimInstance()->IsAMontageActive());
 }
 
-bool APlayerInventoryActor::HasItem() {
-	return PLAYER_INVENTORY->HasSelectedItem();
+bool APlayerInventoryActor::HasItem() const {
+	return GetPlayer()->PlayerInventory->HasSelectedItem();
 }
 
-bool APlayerInventoryActor::GetItem(FItemHeap& OutItem) {
-	return PLAYER_INVENTORY->GetSelectedItem(OutItem);
+bool APlayerInventoryActor::GetItem(FItemHeap& OutItem) const {
+	return GetPlayer()->PlayerInventory->GetSelectedItem(OutItem);
 }
