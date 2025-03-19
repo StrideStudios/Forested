@@ -163,7 +163,7 @@ protected:
 	UPROPERTY(BlueprintAssignable)
 	FOnMontageStartDelegate OnNotifyEnd;
 	
-	UFUNCTION(BlueprintCallable, /*meta = (BlueprintInternalUseOnly = "true"),*/ Category = "Montage Library")
+	UFUNCTION(BlueprintCallable, meta = (BlueprintInternalUseOnly = "true"), Category = "Montage Library")
 	static UStartMontageAsyncAction* StartMontage(bool& OutSuccess, USkeletalMeshComponent* SkeletalMeshComponent, UAnimMontage* Montage, bool bCheckGroup = true, float PlayRate = 1.f, float StartingPosition = 0.f);
 
 	virtual void Activate() override;
