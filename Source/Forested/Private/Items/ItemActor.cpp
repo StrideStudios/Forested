@@ -139,7 +139,7 @@ void AItemActor::Unload_Implementation() {
 	StaticMeshComponent->SetSimulatePhysics(false);
 }
 
-bool AItemActor::SpawnItemActor_Internal(const UObject* WorldContextObject, const FTransform& Transform, UItem* Item, FItemLoadDelegate OnItemLoadComplete, const FVector InLinearVelocity, const FVector InAngularVelocity) {
+bool AItemActor::SpawnItemActor(const UObject* WorldContextObject, const FTransform& Transform, UItem* Item, const FVector& InLinearVelocity, const FVector& InAngularVelocity, const TDelegateWrapper<FItemLoadDelegate>& OnItemLoadComplete) {
 	UWorld* World = WorldContextObject->GetWorld();
 	if (!World) {
 		LOG_ERROR("Invalid World Given");
@@ -196,9 +196,9 @@ UItemActorSpawnAsyncAction* UItemActorSpawnAsyncAction::SpawnItemActor(UObject* 
 }
 
 void UItemActorSpawnAsyncAction::Activate() {
-	const bool bSuccess = AItemActor::SpawnItemActor(Object, Transform, Item, [this](AItemActor* SpawnedItemActor){
+	const bool bSuccess = AItemActor::SpawnItemActor(Object, Transform, Item, LinearVelocity, AngularVelocity, [this](AItemActor* SpawnedItemActor){
 		Complete.Broadcast(SpawnedItemActor);
-	}, LinearVelocity, AngularVelocity);
+	});
 	if (!bSuccess) Failed.Broadcast(nullptr);
 }
 

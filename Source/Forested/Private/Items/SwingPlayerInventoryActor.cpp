@@ -1,4 +1,6 @@
 #include "Items/SwingPlayerInventoryActor.h"
+
+#include "MontageLibrary.h"
 #include "Interfaces/DamageableInterface.h"
 #include "Player/FPlayer.h"
 #include "NiagaraComponent.h"
@@ -33,7 +35,7 @@ void ASwingPlayerInventoryActor::InventoryTick(const float DeltaTime) {
 			FHitResult HitResult;
 			TArray<AActor*> ActorsToIgnore;
 			ActorsToIgnore.Add(this);
-			ActorsToIgnore.Add(PLAYER);
+			ActorsToIgnore.Add(GetPlayer());
 
 			if (!UKismetSystemLibrary::SphereTraceSingle(this, StartTrace->GetComponentLocation(), EndTrace->GetComponentLocation(), 4.f, UEngineTypes::ConvertToTraceType(HIT_TRACE_CHANNEL), false, ActorsToIgnore, EDrawDebugTrace::None, HitResult, true))
 				break;
@@ -41,17 +43,18 @@ void ASwingPlayerInventoryActor::InventoryTick(const float DeltaTime) {
 				break;
 			if (HitResult.GetComponent()->IsAnySimulatingPhysics())
 				HitResult.GetComponent()->AddImpulseAtLocation(HitResult.ImpactNormal * -1.f, HitResult.Location);
-			PauseMontage(SwingMontage);
-            StopMontage(HitBlend, SwingMontage);
+			USkeletalMeshComponent* Mesh = GetPlayer()->GetMesh();
+			UMontageLibrary::PauseMontage(Mesh, SwingMontage);
+            UMontageLibrary::StopMontage(Mesh, SwingMontage, HitBlend);
             WeaponSwing->SetVisibility(false);
-			PLAYER->EnablePlayerMovement();
-			//PLAYER->ResetMeshSize();
+			GetPlayer()->EnablePlayerMovement();
+			//GetPlayer()->ResetMeshSize();
 			bHit = true;
 			bCanHit = false;
 			Delay = HitDelay;
 			WeaponSwing->SetVisibility(false);
 			UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitNiagaraSystem, HitResult.Location, UKismetMathLibrary::MakeRotFromX(HitResult.ImpactNormal));
-			UDamageLibrary::ApplyDamage(HitResult.GetActor(), PLAYER, HitResult, Damage, DamageType);
+			UDamageLibrary::ApplyDamage(HitResult.GetActor(), GetPlayer(), HitResult, Damage, DamageType);
 			break;
 		}
 	}
@@ -77,22 +80,19 @@ void ASwingPlayerInventoryActor::OnMontageNotifyEnd(const UAnimMontage* Montage,
 void ASwingPlayerInventoryActor::OnMontageBlendOut(const UAnimMontage* Montage, const bool bInterrupted) {
 	if (SwingMontage && SwingMontage == Montage) {
 		WeaponSwing->SetVisibility(false);
-		PLAYER->EnablePlayerMovement();
+		GetPlayer()->EnablePlayerMovement();
 	}
 }
 
-bool ASwingPlayerInventoryActor::CanMontagePlay_Implementation(const UAnimMontage* Montage, const float PlayRate, const float StartingPosition) const {
-	return !IsSwinging() && CanSwing();
-}
-
 bool ASwingPlayerInventoryActor::Swing(UAnimMontage* Montage, const FAlphaBlend& InHitBlend, const float InHitDelay, const float PlayRate, const float StartingPosition) {
-	if (StartMontage(Montage, PlayRate, StartingPosition)) {
+	if (!CanSwing()) return false;
+	if (UMontageLibrary::StartMontage(GetPlayer()->GetMesh(), Montage, PlayRate, StartingPosition)) {
 		SwingMontage = Montage;
 		HitBlend = InHitBlend;
 		HitDelay = InHitDelay;
 		bHit = false;
 		PTraceTransform = RootComponent->GetComponentTransform();
-		PLAYER->DisablePlayerMovement();
+		GetPlayer()->DisablePlayerMovement();
 		return true;
 	}
 	return false;
@@ -100,7 +100,7 @@ bool ASwingPlayerInventoryActor::Swing(UAnimMontage* Montage, const FAlphaBlend&
 
 bool ASwingPlayerInventoryActor::IsSwinging() const {
 	if (!SwingMontage) return false;
-	if (const UAnimInstance* AnimInstance = PLAYER->GetMesh()->GetAnimInstance()) {
+	if (const UAnimInstance* AnimInstance = GetPlayer()->GetMesh()->GetAnimInstance()) {
 		return AnimInstance->Montage_IsActive(SwingMontage);
 	}
 	return false;

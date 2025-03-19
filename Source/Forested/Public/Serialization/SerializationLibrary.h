@@ -49,32 +49,21 @@ class FSerializationLibrary {
 	
 public:
 
-	static TSharedPtr<FStreamableHandle> LoadAsync(const FSoftPtr& TargetToStream) {
-		return LoadAsync({ TargetToStream }, {});
-	}
-	
-	template <class UserClass>
-	static TSharedPtr<FStreamableHandle> LoadAsync(const FSoftPtr& TargetToStream, UserClass* InObj, FStreamableDelegate::TUObjectMethodDelegate<UserClass> DelegateToCall) {
-		return LoadAsync({ TargetToStream }, FStreamableDelegate::CreateUObject(InObj, DelegateToCall));
-	}
-	
-	template <class UserClass>
-	static TSharedPtr<FStreamableHandle> LoadAsync(const TArray<FSoftPtr>& TargetsToStream, UserClass* InObj, FStreamableDelegate::TUObjectMethodDelegate<UserClass> DelegateToCall) {
-		return LoadAsync(TargetsToStream, FStreamableDelegate::CreateUObject(InObj, DelegateToCall));
-	}
-	
-	static TSharedPtr<FStreamableHandle> LoadAsync(const FSoftPtr& TargetToStream, const TFunction<void()>& Predicate) {
-		return LoadAsync({ TargetToStream }, FStreamableDelegate::CreateLambda(Predicate));
+	static TSharedPtr<FStreamableHandle> LoadAsync(const FSoftPtr& TargetToStream, const TDelegateWrapper<FStreamableDelegate>& Delegate) {
+		return LoadAsync(TArray<FSoftPtr>{TargetToStream}, Delegate);
 	}
 
-	static TSharedPtr<FStreamableHandle> LoadAsync(const TArray<FSoftPtr>& TargetsToStream, const TFunction<void()>& Predicate) {
-		return LoadAsync(TargetsToStream, FStreamableDelegate::CreateLambda(Predicate));
+	static TSharedPtr<FStreamableHandle> LoadAsync(const TArray<FSoftPtr>& TargetsToStream, const TDelegateWrapper<FStreamableDelegate>& Delegate) {
+		const TArray<FSoftObjectPath> Targets = GetInvalidTargets(TargetsToStream);
+		if (!Targets.Num()) {
+			Delegate.Execute();
+			return {};
+		}
+		return LoadAsync_Internal(Targets, Delegate);
 	}
-
+	
 	static TSharedPtr<FStreamableHandle> LoadSync(const FSoftPtr& TargetToStream) {
-		const TArray<FSoftObjectPath> Targets = GetInvalidTargets({TargetToStream});
-		if (!Targets.Num()) return {};
-		return LoadSync_Internal(Targets);
+		return LoadSync(TArray<FSoftPtr>{TargetToStream});
 	}
 
 	static TSharedPtr<FStreamableHandle> LoadSync(const TArray<FSoftPtr>& TargetsToStream) {
@@ -84,7 +73,7 @@ public:
 	}
 
 	static void Unload(const FSoftPtr& TargetToStream) {
-		Unload({ TargetToStream });
+		Unload(TArray<FSoftPtr>{TargetToStream});
 	}
 
 	static void Unload(const TArray<FSoftPtr>& TargetsToStream) {
@@ -96,15 +85,6 @@ public:
 	}
 
 private:
-
-	static TSharedPtr<FStreamableHandle> LoadAsync(const TArray<FSoftPtr>& TargetsToStream, const FStreamableDelegate& Delegate) {
-		const TArray<FSoftObjectPath> Targets = GetInvalidTargets(TargetsToStream);
-		if (!Targets.Num()) {
-			Delegate.ExecuteIfBound();
-			return {};
-		}
-		return LoadAsync_Internal(Targets, Delegate);
-	}
 
 	static TArray<FSoftObjectPath> GetValidTargets(const TArray<FSoftPtr>& TargetsToStream) {
 		TArray<FSoftObjectPath> Targets;

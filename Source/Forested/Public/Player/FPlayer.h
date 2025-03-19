@@ -125,15 +125,7 @@ public:
 	void PlayFootstep();
 
 	//interpolate the player's position to a world-space transform
-	template<class UserClass>
-	void InterpolatePlayerTo(const FTransform& Transform, const float Time = 1.f, const TEnumAsByte<EEasingFunc::Type> EasingFunc = EEasingFunc::EaseInOut, UserClass* InObj = nullptr, FInterpolatePlayerDelegate::TUObjectMethodDelegate<UserClass> OnUpdate = {}, FInterpolatePlayerDelegate::TUObjectMethodDelegate<UserClass> OnComplete = {}) {
-		InterpolatePlayerTo_Internal(Transform, Time, EasingFunc, FInterpolatePlayerDelegate::CreateUObject(InObj, OnUpdate), FInterpolatePlayerDelegate::CreateUObject(InObj, OnComplete));
-	}
-
-	//interpolate the player's position to a world-space transform
-	void InterpolatePlayerTo(const FTransform& Transform, const float Time = 1.f, const TEnumAsByte<EEasingFunc::Type> EasingFunc = EEasingFunc::EaseInOut, TFunction<void(AFPlayer*)> OnUpdate = {}, TFunction<void(AFPlayer*)> OnComplete = {}) {
-		InterpolatePlayerTo_Internal(Transform, Time, EasingFunc, FInterpolatePlayerDelegate::CreateLambda(OnUpdate), FInterpolatePlayerDelegate::CreateLambda(OnComplete));
-	}
+	void InterpolatePlayerTo(const FTransform& Transform, const float Time = 1.f, const TEnumAsByte<EEasingFunc::Type> EasingFunc = EEasingFunc::EaseInOut, const TDelegateWrapper<FInterpolatePlayerDelegate>& OnUpdate = {}, const TDelegateWrapper<FInterpolatePlayerDelegate>& OnComplete = {});
 	
 	UPROPERTY(BlueprintAssignable, Category = "Player|Health")
 	FOnHealthUpdate OnHealthUpdate;
@@ -180,10 +172,7 @@ protected:
 	float MaxHoverDistance = 10000.f;
 
 private:
-
-	//interpolate the player's position to a world-space transform
-	void InterpolatePlayerTo_Internal(const FTransform& Transform, float Time = 1.f, TEnumAsByte<EEasingFunc::Type> EasingFunc = EEasingFunc::EaseInOut, FInterpolatePlayerDelegate OnUpdate = {}, FInterpolatePlayerDelegate OnComplete = {});
-
+	
 	void AddOnDestroyedListener(AActor* Actor);
 	
 	UFUNCTION()

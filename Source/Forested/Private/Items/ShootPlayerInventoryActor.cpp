@@ -1,4 +1,6 @@
 #include "Items/ShootPlayerInventoryActor.h"
+
+#include "MontageLibrary.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Interfaces/DamageableInterface.h"
 #include "Items/ShootItem.h"
@@ -17,7 +19,7 @@ void AShootPlayerInventoryActor::Init(AFPlayer* InPlayer) {
 	Super::Init(InPlayer);
 	if (WidgetClass.IsNull()) return;
 	FSerializationLibrary::LoadSync(WidgetClass);
-	ShootWidget = CreateWidget<UShootWidget>(PLAYER->GetPlayerController(), WidgetClass.Get());
+	ShootWidget = CreateWidget<UShootWidget>(GetPlayer()->GetPlayerController(), WidgetClass.Get());
 	ShootWidget->AddToViewport(-1);
 }
 
@@ -30,8 +32,14 @@ void AShootPlayerInventoryActor::Deinit() {
 void AShootPlayerInventoryActor::OnMontageBlendOut(const UAnimMontage* Montage, const bool bInterrupted) {
 	Super::OnMontageBlendOut(Montage, bInterrupted);
 	if (ShootMontage && ShootMontage == Montage) {
-		PLAYER->EnablePlayerMovement();
+		GetPlayer()->EnablePlayerMovement();
+		ShootMontage = nullptr;
 		EndShot();
+	}
+	if (ReloadMontage && ReloadMontage == Montage) {
+		GetPlayer()->EnablePlayerMovement();
+		ReloadMontage = nullptr;
+		EndReload();
 	}
 }
 
@@ -59,17 +67,17 @@ bool AShootPlayerInventoryActor::TraceShot(FHitResult& OutHit, const FVector Sho
 }
 
 bool AShootPlayerInventoryActor::Shoot(UAnimMontage* Montage, const FViewmodelVector ShootLocation, const float PlayRate, const float StartingPosition, const bool Aimed) {
+	if (IsReloading() || IsShooting()) return false;
 	UShootItem* ShootItem;
-	if (!GetShootItem(ShootItem)) return false;
-	if (ShootItem->Bullets <= 0) return false;
-	if (StartMontage(Montage, PlayRate, StartingPosition)) {
+	if (!GetShootItem(ShootItem) || ShootItem->Bullets <= 0) return false;
+	if (UMontageLibrary::StartMontage(GetPlayer()->GetMesh(), Montage, PlayRate, StartingPosition)) {
 		ShootItem->Bullets--;
 		
 		ShootMontage = Montage;
 		
-		PLAYER->AddControllerPitchInput(-0.1f);
+		GetPlayer()->AddControllerPitchInput(-0.1f);
 		
-		PLAYER->DisablePlayerMovement();
+		GetPlayer()->DisablePlayerMovement();
 		
 		for (int i = 0; i < AmountOfProjectiles; i++) {
 			
@@ -80,7 +88,7 @@ bool AShootPlayerInventoryActor::Shoot(UAnimMontage* Montage, const FViewmodelVe
 			if (TraceShot(HitResult, ShootLocation, RandomRotation, RandomSpread)) {
 				float Damage = Aimed ? MaxDamage.Y : MaxDamage.X;
 				Damage = (1.f - HitResult.Distance / Range) * Damage;
-				UDamageLibrary::ApplyDamage(HitResult.GetActor(), PLAYER, HitResult, Damage, EDamageType::Gun);
+				UDamageLibrary::ApplyDamage(HitResult.GetActor(), GetPlayer(), HitResult, Damage, EDamageType::Gun);
 				UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitNiagaraSystem, HitResult.Location, UKismetMathLibrary::MakeRotFromX(HitResult.ImpactNormal));
 			}
 		}
@@ -91,10 +99,12 @@ bool AShootPlayerInventoryActor::Shoot(UAnimMontage* Montage, const FViewmodelVe
 }
 
 bool AShootPlayerInventoryActor::Reload(UAnimMontage* Montage, const float PlayRate, const float StartingPosition, const bool FullReload, const int BulletsToAdd) {
+	if (IsReloading() || IsShooting()) return false;
 	UShootItem* ShootItem;
-	if (!GetShootItem(ShootItem)) return false;
-	if (ShootItem->Bullets >= MaxBullets) return false;
-	if (StartMontage(Montage, PlayRate, StartingPosition)) {
+	if (!GetShootItem(ShootItem) || ShootItem->Bullets >= MaxBullets) return false;
+	if (UMontageLibrary::StartMontage(GetPlayer()->GetMesh(), Montage, PlayRate, StartingPosition)) {
+		ReloadMontage = Montage;
+		
 		if (FullReload) {
 			ShootItem->Bullets = MaxBullets;
 		} else {
@@ -106,9 +116,9 @@ bool AShootPlayerInventoryActor::Reload(UAnimMontage* Montage, const float PlayR
 	return false;
 }
 
-
 bool AShootPlayerInventoryActor::Aim(UAnimMontage* Montage, const float PlayRate, const float StartingPosition) {
-	if (StartMontage(Montage, PlayRate, StartingPosition)) {
+	if (IsReloading() || IsShooting()) return false;
+	if (UMontageLibrary::StartMontage(GetPlayer()->GetMesh(), Montage, PlayRate, StartingPosition)) {
 		if (ShootWidget) {
 			ShootWidget->OnAim(this);
 		}
@@ -120,15 +130,16 @@ bool AShootPlayerInventoryActor::Aim(UAnimMontage* Montage, const float PlayRate
 }
 
 bool AShootPlayerInventoryActor::UnAim(UAnimMontage* Montage) {
+	if (IsReloading() || IsShooting()) return false;
 	if (ShootWidget) {
 		ShootWidget->OnUnaim(this);
 	}
 	GetPlayerAnimInstance()->LeanIntensity = FVector2D(1.f);
 	GetPlayerAnimInstance()->TargetPoseBlend = 0.f;
-	if (ResumeMontage(Montage)) {
+	if (UMontageLibrary::ResumeMontage(GetPlayer()->GetMesh(), Montage)) {
 		return true;
 	}
-	StopMontage(0.25f, Montage);
+	UMontageLibrary::StopMontage(GetPlayer()->GetMesh(), Montage, 0.25f);
 	return false;
 }
 
@@ -142,7 +153,7 @@ void AShootPlayerInventoryActor::TransformWidgetToShootPoint(const float DeltaSe
 	const FVector TargetLocation = bHit ? HitResult.Location : ShootLocation + GetMesh()->GetForwardVector() * Range;
 
 	FVector2D TargetTranslation;
-	if (UGameplayStatics::ProjectWorldToScreen(PLAYER->GetPlayerController(), TargetLocation, TargetTranslation, true)) {
+	if (UGameplayStatics::ProjectWorldToScreen(GetPlayer()->GetPlayerController(), TargetLocation, TargetTranslation, true)) {
 		if (ShootWidgetTranslation.IsZero()) {
 			ShootWidgetTranslation = TargetTranslation;
 		}

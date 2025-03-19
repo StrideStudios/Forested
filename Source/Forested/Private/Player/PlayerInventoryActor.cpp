@@ -1,4 +1,6 @@
 #include "Player/PlayerInventoryActor.h"
+
+#include "MontageLibrary.h"
 #include "Player/FPlayer.h"
 #include "Player/ViewmodelMeshes.h"
 #include "Player/PlayerInventory.h"
@@ -55,75 +57,40 @@ UPlayerAnimInstance* APlayerInventoryActor::GetPlayerAnimInstance() const {
 	return CastChecked<UPlayerAnimInstance>(Player->GetMesh()->GetAnimInstance());
 }
 
-bool APlayerInventoryActor::StartMontage(UAnimMontage* MontageToPlay, const float PlayRate, const float StartingPosition) const {
-	const FName SlotName = MontageToPlay->GetGroupName();
-	if (!bAnimationsLoaded || !MontageToPlay || GetPlayerAnimInstance()->IsAMontageOfGroupActive(SlotName) || !CanMontagePlay(MontageToPlay, PlayRate, StartingPosition)) return false;
-	const float f = GetPlayerAnimInstance()->Montage_Play(MontageToPlay, PlayRate, EMontagePlayReturnType::MontageLength, StartingPosition);
-	return f > 0.f;
+void APlayerInventoryActor::OnMontageNotifyBegin(const UAnimMontage* Montage, const FName Notify) {
+	//pause montage can be built in because it is common
+	if (Notify == "PauseMontage") {
+		UMontageLibrary::PauseMontage(GetPlayer()->GetMesh(), Montage);
+	}
+	ReceiveOnMontageNotifyBegin(Montage, Notify);
 }
 
-bool APlayerInventoryActor::PauseMontage(const UAnimMontage* Montage) const {
-	if (!bAnimationsLoaded) return false;
-	FAnimMontageInstance* ActiveMontage = GetPlayerAnimInstance()->GetMontageInstance(Montage, true); 
-	if (ActiveMontage && GetPlayerAnimInstance()->IsMontageActive(Montage) && CanMontagePause(ActiveMontage->Montage)) {
-		ActiveMontage->Pause();
-		return true;
-	}
-	return false;
-}
-
-bool APlayerInventoryActor::ResumeMontage(const UAnimMontage* Montage) const {
-	if (!bAnimationsLoaded) return false;
-	FAnimMontageInstance* ActiveMontage = GetPlayerAnimInstance()->GetMontageInstance(Montage, true); 
-	if (ActiveMontage && !ActiveMontage->IsPlaying() && GetPlayerAnimInstance()->IsMontageActive(Montage) && !GetPlayerAnimInstance()->IsMontagePlaying(Montage) && CanMontageResume(ActiveMontage->Montage)) {
-		ActiveMontage->SetPlaying(true);
-		return true;
-	}
-	return false;
-}
-//TODO: library and parity between this and player inventory
-bool APlayerInventoryActor::StopMontage(const float BlendOutTime, const UAnimMontage* Montage) const {
-	if (!GetPlayerAnimInstance()->IsMontageActive(Montage) || !CanMontageStop(BlendOutTime, Montage)) return false;
-	FAlphaBlend Blend = FAlphaBlend(Montage->BlendOut);
-	Blend.SetBlendTime(BlendOutTime);
-	return StopMontage(Blend, Montage);
-}
-
-bool APlayerInventoryActor::StopMontage(const FAlphaBlend& Blend, const UAnimMontage* Montage) const {
-	if (!bAnimationsLoaded) return false;
-	if (FAnimMontageInstance* ActiveMontage = GetPlayerAnimInstance()->GetMontageInstance(Montage, true)) {
-		ActiveMontage->Stop(Blend);
-		return true;
-	}
-	return false;
-}
-//TODO: Can switch during montage for some reason
 void APlayerInventoryActor::OnLeftInteract() {
-	ReceiveOnLeftInteract(GetPlayerAnimInstance()->IsAMontageActive());
+	ReceiveOnLeftInteract(UMontageLibrary::IsAMontageActive(GetPlayerAnimInstance()));
 }
 
 void APlayerInventoryActor::OnLeftEndInteract() {
-	ReceiveOnLeftEndInteract(GetPlayerAnimInstance()->IsAMontageActive());
+	ReceiveOnLeftEndInteract(UMontageLibrary::IsAMontageActive(GetPlayerAnimInstance()));
 }
 
 void APlayerInventoryActor::OnRightInteract() {
-	ReceiveOnRightInteract(GetPlayerAnimInstance()->IsAMontageActive());
+	ReceiveOnRightInteract(UMontageLibrary::IsAMontageActive(GetPlayerAnimInstance()));
 }
 
 void APlayerInventoryActor::OnRightEndInteract() {
-	ReceiveOnRightEndInteract(GetPlayerAnimInstance()->IsAMontageActive());
+	ReceiveOnRightEndInteract(UMontageLibrary::IsAMontageActive(GetPlayerAnimInstance()));
 }
 
 void APlayerInventoryActor::OnButtonInteract() {
-	ReceiveOnButtonInteract(GetPlayerAnimInstance()->IsAMontageActive());
+	ReceiveOnButtonInteract(UMontageLibrary::IsAMontageActive(GetPlayerAnimInstance()));
 }
 
 void APlayerInventoryActor::OnReload() {
-	ReceiveOnReload(GetPlayerAnimInstance()->IsAMontageActive());
+	ReceiveOnReload(UMontageLibrary::IsAMontageActive(GetPlayerAnimInstance()));
 }
 
 void APlayerInventoryActor::OnEndReload() {
-	ReceiveOnEndReload(GetPlayerAnimInstance()->IsAMontageActive());
+	ReceiveOnEndReload(UMontageLibrary::IsAMontageActive(GetPlayerAnimInstance()));
 }
 
 bool APlayerInventoryActor::HasItem() const {

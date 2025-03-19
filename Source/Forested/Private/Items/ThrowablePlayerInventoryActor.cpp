@@ -1,4 +1,6 @@
 #include "Items/ThrowablePlayerInventoryActor.h"
+
+#include "MontageLibrary.h"
 #include "Player/FPlayer.h"
 #include "Components/SplineRenderComponent.h"
 #include "Player/ViewmodelMeshes.h"
@@ -51,13 +53,13 @@ void AThrowablePlayerInventoryActor::InventoryTick(const float DeltaTime) {
 void AThrowablePlayerInventoryActor::OnLeftInteract() {
 	Super::OnLeftInteract();
 	if (!HoldingRightClick || GetPlayerAnimInstance()->GetCurrentActiveMontage() != ThrowAnimMontage) return;
-	if (StopMontage(0.1f, ThrowAnimMontage))
+	if (UMontageLibrary::StopMontage(GetPlayer()->GetMesh(), ThrowAnimMontage, 0.1f))
 		ThrowItem();
 }
 
 void AThrowablePlayerInventoryActor::OnRightInteract() {
 	Super::OnRightInteract();
-	StartMontage(ThrowAnimMontage);
+	UMontageLibrary::StartMontage(GetPlayer()->GetMesh(), ThrowAnimMontage);
 }
 
 void AThrowablePlayerInventoryActor::OnRightEndInteract() {
@@ -66,15 +68,15 @@ void AThrowablePlayerInventoryActor::OnRightEndInteract() {
 	Spline->ClearSplinePoints();
 	Spline->ClearComponents();
 	if (GetPlayerAnimInstance()->GetCurrentActiveMontage() != ThrowAnimMontage) return;
-	if (!ResumeMontage(ThrowAnimMontage)) {
-		StopMontage(0.25f, ThrowAnimMontage);
+	if (!UMontageLibrary::ResumeMontage(GetPlayer()->GetMesh(), ThrowAnimMontage)) {
+		UMontageLibrary::StopMontage(GetPlayer()->GetMesh(), ThrowAnimMontage, 0.25f);
 	}
 }
 
 void AThrowablePlayerInventoryActor::OnMontageNotifyBegin(const UAnimMontage* Montage, const FName Notify) {
 	Super::OnMontageNotifyBegin(Montage, Notify);
 	if (GetPlayerAnimInstance()->GetCurrentActiveMontage() == ThrowAnimMontage && Notify == "PauseMontage") {
-		PauseMontage(Montage);
+		UMontageLibrary::PauseMontage(GetPlayer()->GetMesh(), Montage);
 		HoldingRightClick = true;
 	}
 }
@@ -86,15 +88,15 @@ void AThrowablePlayerInventoryActor::ThrowItem() const {
 	GetLaunchVelocity(LaunchVelocity);
 	if (LaunchVelocity.IsNearlyZero()) return;
 	//TODO: adjust velocity to match spline location
-	AItemActor::SpawnItemActor(GetWorld(), StaticMeshComponent->GetComponentTransform(), ItemHeap.Top(), [](const AItemActor* Item) {
-		PLAYER_INVENTORY->RemoveItem(PLAYER_INVENTORY->GetSelectedSlot());
-	}, LaunchVelocity);
+	AItemActor::SpawnItemActor(GetWorld(), StaticMeshComponent->GetComponentTransform(), ItemHeap.Top(), LaunchVelocity, FVector(0.0), [this](const AItemActor* Item) {
+		GetPlayer()->PlayerInventory->RemoveItem(GetPlayer()->PlayerInventory->GetSelectedSlot());
+	});
 }
 
 void AThrowablePlayerInventoryActor::GetLaunchVelocity(FVector& OutVelocity) const {
-	OutVelocity = PLAYER->Camera->GetForwardVector() * ImpulseVelocity;
-	if (AThrowableTargetActor* TargetActor = Cast<AThrowableTargetActor>(PLAYER->GetHoveredHitResult().GetActor())) {
-		GetLaunchVelocity_Internal(Spline->GetComponentLocation(), TargetActor->GetActorLocation(), { PLAYER, TargetActor}, OutVelocity);
+	OutVelocity = GetPlayer()->Camera->GetForwardVector() * ImpulseVelocity;
+	if (AThrowableTargetActor* TargetActor = Cast<AThrowableTargetActor>(GetPlayer()->GetHoveredHitResult().GetActor())) {
+		GetLaunchVelocity_Internal(Spline->GetComponentLocation(), TargetActor->GetActorLocation(), { GetPlayer(), TargetActor}, OutVelocity);
 	}
 }
 

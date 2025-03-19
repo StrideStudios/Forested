@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ViewmodelMeshes.h"
 #include "Forested/ForestedMinimal.h"
+#include "ViewmodelMeshes.h"
 #include "GameFramework/Actor.h"
 #include "PlayerInventoryActor.generated.h"
 
@@ -43,20 +43,6 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, DisplayName = "Deinit", Category = "Inventory Render Actor")
 	void ReceiveDeinit();
 	
-	UFUNCTION(BlueprintCallable, BlueprintPure=false, Category = "Inventory Render Actor|Montage")
-	bool StartMontage(UAnimMontage* MontageToPlay, float PlayRate = 1.f, float StartingPosition = 0.f) const; 
-
-	UFUNCTION(BlueprintCallable, BlueprintPure=false, Category = "Inventory Render Actor|Montage")
-	bool PauseMontage(const UAnimMontage* Montage = nullptr) const; 
-
-	UFUNCTION(BlueprintCallable, BlueprintPure=false, Category = "Inventory Render Actor|Montage")
-	bool ResumeMontage(const UAnimMontage* Montage = nullptr) const; 
-
-	UFUNCTION(BlueprintCallable, BlueprintPure=false, Category = "Inventory Render Actor|Montage")
-	bool StopMontage(float BlendOutTime, const UAnimMontage* Montage = nullptr) const; 
-
-	bool StopMontage(const FAlphaBlend& Blend, const UAnimMontage* Montage = nullptr) const; 
-	
 	virtual void OnMontageComplete(const UAnimMontage* Montage, const bool bInterrupted) {
 		ReceiveOnMontageComplete(Montage , bInterrupted);
 	}
@@ -65,13 +51,7 @@ public:
 		ReceiveOnMontageBlendOut(Montage, bInterrupted);
 	}
 
-	virtual void OnMontageNotifyBegin(const UAnimMontage* Montage, const FName Notify) {
-		//pause montage can be built in because it is common
-		if (Notify == "PauseMontage") {
-			PauseMontage(Montage);
-		}
-		ReceiveOnMontageNotifyBegin(Montage, Notify);
-	}
+	virtual void OnMontageNotifyBegin(const UAnimMontage* Montage, const FName Notify);
 
 	virtual void OnMontageNotifyEnd(const UAnimMontage* Montage, const FName Notify) {
 		ReceiveOnMontageNotifyEnd(Montage, Notify);
@@ -94,22 +74,6 @@ public:
 	virtual void OnManualBlendOutMontageComplete(const UAnimMontage* Montage) {
 		ReceiveOnManualBlendOutMontageComplete(Montage);
 	}
-	
-	UFUNCTION(BlueprintNativeEvent, Category = "Inventory Render Actor|Montage")
-	bool CanMontagePlay(const UAnimMontage* Montage, float PlayRate, float StartingPosition) const;
-	virtual bool CanMontagePlay_Implementation(const UAnimMontage* Montage, float PlayRate, float StartingPosition) const { return true; }
-
-	UFUNCTION(BlueprintNativeEvent, Category = "Inventory Render Actor|Montage")
-	bool CanMontagePause(const UAnimMontage* Montage) const;
-	virtual bool CanMontagePause_Implementation(const UAnimMontage* Montage) const { return true; }
-
-	UFUNCTION(BlueprintNativeEvent, Category = "Inventory Render Actor|Montage")
-	bool CanMontageResume(const UAnimMontage* Montage) const;
-	virtual bool CanMontageResume_Implementation(const UAnimMontage* Montage) const { return true; }
-
-	UFUNCTION(BlueprintNativeEvent, Category = "Inventory Render Actor|Montage")
-	bool CanMontageStop(float BlendOutTime, const UAnimMontage* Montage) const;
-	virtual bool CanMontageStop_Implementation(float BlendOutTime,const UAnimMontage* Montage) const { return true; }
 
 	//viewmodel data to use for player arms mesh
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Viewmodel")

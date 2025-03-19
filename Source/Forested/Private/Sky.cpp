@@ -284,7 +284,7 @@ void ASky::SetRainValue(const float InRainValue) {
 	SkyCollectionInstance->SetScalarParameterValue("RainValue", RainValue);
 }
 
-void ASky::AddTimedEvent_Internal(const FTimedEventDelegate& Complete, const float ExecuteTime) {
+void ASky::AddTimedEvent(const float ExecuteTime, const TDelegateWrapper<FTimedEventDelegate>& Complete) {
 	if (!Complete.IsBound()) {
 		LOG_ERROR("Invalid delegate given, make sure callback is valid");
 		return;
@@ -312,7 +312,7 @@ void ASky::AddTimedEvent_Internal(const FTimedEventDelegate& Complete, const flo
 	AddFrameDelay(PushEvent);
 }
 
-void ASky::AddTimer_Internal(const FTimedEventDelegate& Complete, const FTimedEventDelegate& Update, const float ExecuteTime) {
+void ASky::AddTimer(const float ExecuteTime, const TDelegateWrapper<FTimedEventDelegate>& Complete, const TDelegateWrapper<FTimedEventDelegate>& Update) {
 	if (!Complete.IsBound() || !Update.IsBound()) {
 		LOG_ERROR("Invalid delegate given, make sure callback is valid");
 		return;
@@ -340,7 +340,7 @@ void ASky::AddTimer_Internal(const FTimedEventDelegate& Complete, const FTimedEv
 	AddFrameDelay(PushEvent);
 }
 
-void ASky::AddFrameDelay_Internal(const FFrameDelayDelegate& Complete) {
+void ASky::AddFrameDelay(const TDelegateWrapper<FFrameDelayDelegate>& Complete) {
 	if (!Complete.IsBound()) {
 		LOG_ERROR("Invalid delegate given, make sure callback is valid");
 		return;

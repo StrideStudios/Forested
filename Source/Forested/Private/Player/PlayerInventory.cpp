@@ -1,4 +1,6 @@
 #include "Player/PlayerInventory.h"
+
+#include "MontageLibrary.h"
 #include "Player/FPlayer.h"
 #include "Player/PlayerInputComponent.h"
 #include "Widget/PlayerWidget.h"
@@ -240,8 +242,8 @@ void UPlayerAnimInstance::NativeUpdateAnimation(const float DeltaSeconds) {
 	IsSwimming = Player->PlayerInputComponent->IsSwimming();
 	IsFalling = Player->GetCharacterMovement()->IsFalling() && !IsSwimming;
 	IsMoving = !Player->GetCharacterMovement()->GetCurrentAcceleration().Equals(FVector(0.f)) && UnitVelocity > 5.f;
-	if (const FAnimMontageInstance* Montage = GetAnyActiveMontageInstance()) {
-		if (!Montage->bEnableAutoBlendOut && !IsMontageInstancePlaying(Montage)) {
+	if (const FAnimMontageInstance* Montage = UMontageLibrary::GetAnyActiveMontageInstance(this)) {
+		if (!Montage->bEnableAutoBlendOut && !UMontageLibrary::IsMontageInstancePlaying(Montage)) {
 			//when the unequip finishes, we load data for the next actor
 			//TODO: move to blend out?
 			if (Montage->Montage == RenderActor->UnEquipAnimMontage) {
@@ -290,14 +292,14 @@ void UPlayerAnimInstance::SetNewInventoryRenderActor(const TSubclassOf<APlayerIn
 	}
 
 	//if no montage is active unequip and prepare for loading data
-	if (!IsAMontageActive()) {
-		RenderActor->StartMontage(RenderActor->UnEquipAnimMontage, CurrentPlayRate);
+	if (!UMontageLibrary::IsAMontageActive(this)) {
+		UMontageLibrary::StartMontage(Player->GetMesh(), RenderActor->UnEquipAnimMontage, CurrentPlayRate);
 		return;
 	}
 
 	//if equipping and the new render actor is NOT the same, un-equip
 	const FAlphaBlend Blend = FAlphaBlend(0.25f);
-	FAnimMontageInstance* EquipMontage = GetActiveMontageInstance(RenderActor->EquipAnimMontage, true);
+	FAnimMontageInstance* EquipMontage = UMontageLibrary::GetActiveMontageInstance(this, RenderActor->EquipAnimMontage, true);
 	if (EquipMontage && RenderActor->GetClass() != NextRenderActor) {
 		EquipMontage->Stop(Blend);
 		Montage_Play(RenderActor->UnEquipAnimMontage, CurrentPlayRate);
@@ -305,7 +307,7 @@ void UPlayerAnimInstance::SetNewInventoryRenderActor(const TSubclassOf<APlayerIn
 	}
 	
 	//if un-equipping and the new render actor IS the same, re-equip
-	FAnimMontageInstance* UnequipMontage = GetActiveMontageInstance(RenderActor->UnEquipAnimMontage, true);
+	FAnimMontageInstance* UnequipMontage = UMontageLibrary::GetActiveMontageInstance(this, RenderActor->UnEquipAnimMontage, true);
 	if (UnequipMontage && RenderActor->GetClass() == NextRenderActor) {
 		UnequipMontage->Stop(Blend);
 		Montage_Play(RenderActor->EquipAnimMontage, CurrentPlayRate);
@@ -315,7 +317,7 @@ void UPlayerAnimInstance::SetNewInventoryRenderActor(const TSubclassOf<APlayerIn
 void UPlayerAnimInstance::LoadAnimationData() {
 	
 	//if current active montage is unequip, we stop it with blend
-	FAnimMontageInstance* Montage = GetAnyActiveMontageInstance();
+	FAnimMontageInstance* Montage = UMontageLibrary::GetAnyActiveMontageInstance(this);
 	if (Montage && Montage->Montage && Montage->Montage == RenderActor->UnEquipAnimMontage) {
 		Montage->Stop(FAlphaBlend(Montage->GetBlendTime()), false);//TODO: Montage->GetBlend(), 
 	}
@@ -345,7 +347,7 @@ void UPlayerAnimInstance::LoadAnimationData() {
 		}
 		
 		if (RenderActor->EquipAnimMontage)
-			RenderActor->StartMontage(RenderActor->EquipAnimMontage, CurrentPlayRate);
+			UMontageLibrary::StartMontage(Player->GetMesh(), RenderActor->EquipAnimMontage, CurrentPlayRate);
 	}
 }
 
@@ -369,61 +371,12 @@ void UPlayerAnimInstance::MontageNotifyEnd(const FName NotifyName, const FBranch
 	}
 }
 
-FAnimMontageInstance* UPlayerAnimInstance::GetAnyActiveMontageInstance(const bool IncludeBlendingOut) const {
-	for (FAnimMontageInstance* MontageInstance : MontageInstances) {
-		if (MontageInstance && IsMontageInstanceActive(MontageInstance, IncludeBlendingOut))
-			return MontageInstance;
-	}
-	return nullptr;
-}
-
-UAnimMontage* UPlayerAnimInstance::GetCurrentActiveMontageOfGroup(const EAnimationGroups AnimationGroup) const {
+UAnimMontage* UPlayerAnimInstance::GetCurrentActiveMontageOfAnimationGroup(const EAnimationGroups AnimationGroup) const {
 	const FName GroupName = AnimationGroupToName(AnimationGroup);
-	return GetCurrentActiveMontageOfGroup(GroupName);
+	return UMontageLibrary::GetCurrentActiveMontageOfGroup(this, GroupName);
 }
 
-UAnimMontage* UPlayerAnimInstance::GetCurrentActiveMontageOfGroup(const FName GroupName) const {
-	// Start from end, as most recent instances are added at the end of the queue.
-	int32 const NumInstances = MontageInstances.Num();
-	for (int32 InstanceIndex = NumInstances - 1; InstanceIndex >= 0; InstanceIndex--) {
-		const FAnimMontageInstance* MontageInstance = MontageInstances[InstanceIndex];
-		if (MontageInstance && MontageInstance->Montage && MontageInstance->Montage->GetGroupName() == GroupName && MontageInstance->IsActive()) {
-			return MontageInstance->Montage;
-		}
-	}
-
-	return nullptr;
-}
-
-bool UPlayerAnimInstance::IsAMontageOfGroupActive(const EAnimationGroups AnimationGroup, const bool IncludeBlendingOut) const {
+bool UPlayerAnimInstance::IsAMontageOfAnimationGroupActive(const EAnimationGroups AnimationGroup, const bool IncludeBlendingOut) const {
 	const FName GroupName = AnimationGroupToName(AnimationGroup);
-	return IsAMontageOfGroupActive(GroupName, IncludeBlendingOut);
-}
-
-bool UPlayerAnimInstance::IsAMontageOfGroupActive(const FName GroupName, const bool IncludeBlendingOut) const {
-	for (const FAnimMontageInstance* MontageInstance : MontageInstances) {
-		if (MontageInstance && MontageInstance->Montage && MontageInstance->Montage->GetGroupName() == GroupName && IsMontageInstanceActive(MontageInstance, IncludeBlendingOut))
-			return true;
-	}
-	return false;
-}
-
-bool UPlayerAnimInstance::IsAMontageActive(const bool IncludeBlendingOut) const {
-	for (const FAnimMontageInstance* MontageInstance : MontageInstances) {
-		if (MontageInstance && IsMontageInstanceActive(MontageInstance, IncludeBlendingOut))
-			return true;
-	}
-	return false;
-}
-
-bool UPlayerAnimInstance::IsAMontagePlaying(const bool IncludeBlendingOut) const {
-	for (const FAnimMontageInstance* MontageInstance : MontageInstances) {
-		if (MontageInstance && IsMontageInstancePlaying(MontageInstance, IncludeBlendingOut))
-			return true;
-	}
-	return false;
-}
-
-bool UPlayerAnimInstance::IsMontageActive_Internal(const FAnimMontageInstance* MontageInstance, const bool IncludeBlendingOut) {
-	return IncludeBlendingOut || !MontageInstance->bEnableAutoBlendOut || MontageInstance->GetPosition() < MontageInstance->Montage->GetPlayLength() - MontageInstance->Montage->BlendOut.GetBlendTime();
+	return UMontageLibrary::IsAMontageOfGroupActive(this, GroupName, IncludeBlendingOut);
 }

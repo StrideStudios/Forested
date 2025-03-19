@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "Forested.h"
 #include "LevelDefaults.h"
+#include "DelegateWrapper.h"
 
 /*
  * Test Macros

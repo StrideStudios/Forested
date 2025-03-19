@@ -157,22 +157,6 @@ class FORESTED_API UPlayerAnimInstance : public UAnimInstance, public IInitInter
 
 public:
 
-	//TODO: better naming except im lazy as hell
-	
-	FAnimMontageInstance* GetAnyActiveMontageInstance(bool IncludeBlendingOut = false) const;
-
-	FAnimMontageInstance* GetActiveMontageInstance(const UAnimMontage* Montage, const bool IncludeBlendingOut = false) const {
-		FAnimMontageInstance* MontageInstance = GetActiveInstanceForMontage(Montage);
-		if (MontageInstance && IsMontageInstanceActive(MontageInstance, IncludeBlendingOut))
-			return MontageInstance;
-		return nullptr;
-	}
-
-	FAnimMontageInstance* GetMontageInstance(const UAnimMontage* Montage = nullptr, const bool IncludeBlendingOut = false) const {
-		if (!Montage) return GetAnyActiveMontageInstance(IncludeBlendingOut);
-		return GetActiveMontageInstance(Montage, IncludeBlendingOut);
-	}
-
 	/*
 	 * blueprint accessibility functions
 	 */
@@ -180,43 +164,10 @@ public:
 	/** Get a current Active Montage in this AnimInstance of a certain group. 
 		Note that there might be multiple Active at the same time. This will only return the first active one it finds. **/
 	UFUNCTION(BlueprintPure, Category = "Montage", meta = (NotBlueprintThreadSafe))
-	UAnimMontage* GetCurrentActiveMontageOfGroup(EAnimationGroups AnimationGroup) const;
-
-	UAnimMontage* GetCurrentActiveMontageOfGroup(FName GroupName) const;
-
-	//returns true if any montage is active
-	UFUNCTION(BlueprintCallable, BlueprintPure, meta = (AdvancedDisplay), Category = "Inventory Render Actor|Montage")
-	bool IsAMontageOfGroupActive(EAnimationGroups AnimationGroup, bool IncludeBlendingOut = false) const;
+	UAnimMontage* GetCurrentActiveMontageOfAnimationGroup(EAnimationGroups AnimationGroup) const;
 	
-	bool IsAMontageOfGroupActive(FName GroupName, bool IncludeBlendingOut = false) const;
-	
-	//returns true if any montage is active
 	UFUNCTION(BlueprintCallable, BlueprintPure, meta = (AdvancedDisplay), Category = "Inventory Render Actor|Montage")
-	bool IsAMontageActive(bool IncludeBlendingOut = false) const;
-
-	//returns true if any montage is active and playing
-	UFUNCTION(BlueprintCallable, BlueprintPure, meta = (AdvancedDisplay = 1), Category = "Inventory Render Actor|Montage")
-	bool IsAMontagePlaying(bool IncludeBlendingOut = false) const;
-
-	//returns true if Montage is active
-	UFUNCTION(BlueprintCallable, BlueprintPure, meta = (AdvancedDisplay = 1), Category = "Inventory Render Actor|Montage")
-	bool IsMontageActive(const UAnimMontage* Montage, const bool IncludeBlendingOut = false) const {
-		return IsMontageInstanceActive(GetActiveInstanceForMontage(Montage), IncludeBlendingOut);
-	}
-
-	//returns true if Montage is active and playing
-	UFUNCTION(BlueprintCallable, BlueprintPure, meta = (AdvancedDisplay = 1), Category = "Inventory Render Actor|Montage")
-	bool IsMontagePlaying(const UAnimMontage* Montage, const bool IncludeBlendingOut = false) const {
-		return IsMontageInstancePlaying(GetActiveInstanceForMontage(Montage), IncludeBlendingOut);
-	}
-
-	static bool IsMontageInstanceActive(const FAnimMontageInstance* Montage, const bool IncludeBlendingOut = false) {
-		return Montage && Montage->Montage && IsMontageActive_Internal(Montage, IncludeBlendingOut) && Montage->IsActive();
-	}
-
-	static bool IsMontageInstancePlaying(const FAnimMontageInstance* Montage, const bool IncludeBlendingOut = false) {
-		return Montage && Montage->Montage && IsMontageActive_Internal(Montage, IncludeBlendingOut) && Montage->IsPlaying() && Montage->GetPosition() != Montage->GetPreviousPosition();
-	}
+	bool IsAMontageOfAnimationGroupActive(EAnimationGroups AnimationGroup, bool IncludeBlendingOut = false) const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Player Animation Instance")
 	FORCEINLINE bool CanSwitchItems() const;
@@ -305,10 +256,6 @@ protected:
 
 	float CurrentPlayRate = 1.f;
 
-private:
-
-	static bool IsMontageActive_Internal(const FAnimMontageInstance* MontageInstance, const bool IncludeBlendingOut);
-	
 };
 
 UINTERFACE()

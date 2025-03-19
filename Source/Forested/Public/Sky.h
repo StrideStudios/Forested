@@ -31,8 +31,8 @@ enum class ESeason : uint8 {
 };
 
 struct FTimedEvents {
-	FTimedEventDelegate Completed = {};
-	FTimedEventDelegate Update = {};
+	TDelegateWrapper<FTimedEventDelegate> Completed = {};
+	TDelegateWrapper<FTimedEventDelegate> Update = {};
 	float ExecuteTime = 0.f;
 	bool Pending = false;
 
@@ -330,55 +330,20 @@ public:
 	 * a timed events fires once upon completion
 	 * meaning this will wait on in-game pause menus and other things which pause the execution of the sky loop
 	 */
-	template<class UserClass>
-	FORCEINLINE void AddTimedEvent(const float ExecuteTime = 0.f, UserClass* InObj = nullptr, FTimedEventDelegate::TUObjectMethodDelegate<UserClass> InCompleteMethod = {}) {
-		AddTimedEvent_Internal(FTimedEventDelegate::CreateUObject(InObj, InCompleteMethod), ExecuteTime);
-	}
-
-	/*
-	 * adds a timed event based on in-game time
-	 * a timed events fires once upon completion
-	 * meaning this will wait on in-game pause menus and other things which pause the execution of the sky loop
-	 */
-	FORCEINLINE void AddTimedEvent(const float ExecuteTime = 0.f, const TFunction<void(float,float)>& CompleteFunction = {}) {
-		AddTimedEvent_Internal(FTimedEventDelegate::CreateLambda(CompleteFunction), ExecuteTime);
-	}
+	void AddTimedEvent(const float ExecuteTime = 0.f, const TDelegateWrapper<FTimedEventDelegate>& Complete = {});
 
 	/*
 	 * adds a timer based on in-game time
 	 * a timer repeats every frame until completion
 	 * meaning this will wait on in-game pause menus and other things which pause the execution of the sky loop
 	 */
-	template<class UserClass>
-	FORCEINLINE void AddTimer(const float ExecuteTime = 0.f, UserClass* InObj = nullptr, FTimedEventDelegate::TUObjectMethodDelegate<UserClass> InCompleteMethod = {}, FTimedEventDelegate::TUObjectMethodDelegate<UserClass> InUpdateMethod = {}) {
-		AddTimer_Internal(FTimedEventDelegate::CreateUObject(InObj, InCompleteMethod), FTimedEventDelegate::CreateUObject(InObj, InUpdateMethod), ExecuteTime);
-	}
-
-	/*
-	 * adds a timer based on in-game time
-	 * a timer repeats every frame until completion
-	 * meaning this will wait on in-game pause menus and other things which pause the execution of the sky loop
-	 */
-	FORCEINLINE void AddTimer(const float ExecuteTime = 0.f, const TFunction<void(float,float)>& CompleteFunction = {}, const TFunction<void(float,float)>& UpdateFunction = {}) {
-		AddTimer_Internal(FTimedEventDelegate::CreateLambda(CompleteFunction), FTimedEventDelegate::CreateLambda(UpdateFunction), ExecuteTime);
-	}
+	void AddTimer(const float ExecuteTime = 0.f, const TDelegateWrapper<FTimedEventDelegate>& Complete = {}, const TDelegateWrapper<FTimedEventDelegate>& Update = {});
 
 	/*
 	 * adds a delay by a single frame
 	 * meaning this will wait on in-game pause menus and other things which pause the execution of the sky loop
 	 */
-	template<class UserClass>
-	FORCEINLINE void AddFrameDelay(UserClass* InObj = nullptr, FFrameDelayDelegate::TUObjectMethodDelegate<UserClass> InCompleteMethod = {}) {
-		AddFrameDelay_Internal(FFrameDelayDelegate::CreateUObject(InObj, InCompleteMethod));
-	}
-
-	/*
-	 * adds a delay by a single frame
-	 * meaning this will wait on in-game pause menus and other things which pause the execution of the sky loop
-	 */
-	FORCEINLINE void AddFrameDelay(const TFunction<void()>& CompleteFunction = {}) {
-		AddFrameDelay_Internal(FFrameDelayDelegate::CreateLambda(CompleteFunction));
-	}
+	void AddFrameDelay(const TDelegateWrapper<FFrameDelayDelegate>& Complete = {});
 	
 protected:
 
@@ -389,13 +354,7 @@ protected:
 	UMaterialInstanceDynamic* MoonDynamicMaterial;
 
 private:
-
-	void AddTimedEvent_Internal(const FTimedEventDelegate& Complete, float ExecuteTime = 0.f);
-
-	void AddTimer_Internal(const FTimedEventDelegate& Complete, const FTimedEventDelegate& Update, float ExecuteTime = 0.f);
-
-	void AddFrameDelay_Internal(const FFrameDelayDelegate& Complete);
-
+	
 	TArray<FTimedEvents> Timers;
 	
 	TArray<FTimedEvents> TimedEvents;

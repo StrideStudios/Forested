@@ -57,20 +57,26 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Shoot Player Inventory Actor")
 	FORCEINLINE int GetMaxBullets() const { return MaxBullets; }
 
+	UFUNCTION(BlueprintCallable, Category = "Shoot Player Inventory Actor")
+	FORCEINLINE bool IsShooting() const { return ShootMontage != nullptr; }
+
+	UFUNCTION(BlueprintCallable, Category = "Shoot Player Inventory Actor")
+	FORCEINLINE bool IsReloading() const { return ReloadMontage != nullptr; }
+
 	/**
 	 * Blueprint Functions
 	 */
 	
-	UFUNCTION(BlueprintCallable, Category = "Shoot Player Inventory Actor")
+	UFUNCTION(BlueprintCallable, meta = (AdvancedDisplay = 2), Category = "Shoot Player Inventory Actor")
 	bool TraceShot(FHitResult& OutHit, FVector ShootLocation, float Rotation, float InSpread);
 	
-	UFUNCTION(BlueprintCallable, Category = "Shoot Player Inventory Actor")
+	UFUNCTION(BlueprintCallable, meta = (AdvancedDisplay = 2), Category = "Shoot Player Inventory Actor")
 	bool Shoot(UAnimMontage* Montage, FViewmodelVector ShootLocation, float PlayRate = 1.f, float StartingPosition = 0.f, bool Aimed = false);
 	
-	UFUNCTION(BlueprintCallable, Category = "Shoot Player Inventory Actor")
+	UFUNCTION(BlueprintCallable, meta = (AdvancedDisplay = 1), Category = "Shoot Player Inventory Actor")
 	bool Reload(UAnimMontage* Montage, float PlayRate = 1.f, float StartingPosition = 0.f, bool FullReload = true, int BulletsToAdd = 0);
 	
-	UFUNCTION(BlueprintCallable, Category = "Shoot Player Inventory Actor")
+	UFUNCTION(BlueprintCallable, meta = (AdvancedDisplay = 1), Category = "Shoot Player Inventory Actor")
 	bool Aim(UAnimMontage* Montage, float PlayRate = 1.f, float StartingPosition = 0.f);
 
 	UFUNCTION(BlueprintCallable, Category = "Shoot Player Inventory Actor")
@@ -91,6 +97,9 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Shoot Player Inventory Actor")
 	void EndShot();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Shoot Player Inventory Actor")
+	void EndReload();
 
 protected:
 
@@ -135,6 +144,9 @@ private:
 	
 	UPROPERTY()
 	UAnimMontage* ShootMontage;
+
+	UPROPERTY()
+	UAnimMontage* ReloadMontage;
 
 	FVector2D ShootWidgetTranslation;
 

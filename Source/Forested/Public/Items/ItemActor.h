@@ -52,18 +52,7 @@ public:
 	
 	//virtual void SetCullDistance(UPrimitiveComponent* Component, float CullDistance = 0.f) override;
 
-	static bool SpawnItemActor(const UObject* WorldContextObject, const FTransform& Transform, UItem* Item, const FVector& InLinearVelocity = FVector(0.f), const FVector& InAngularVelocity = FVector(0.f)) {
-		return SpawnItemActor_Internal(WorldContextObject, Transform, Item, {}, InLinearVelocity, InAngularVelocity);
-	}
-	
-	template<class UserClass>
-	static bool SpawnItemActor(const UObject* WorldContextObject, const FTransform& Transform, UItem* Item, UserClass* InObj, FItemLoadDelegate::TUObjectMethodDelegate<UserClass> DelegateToCall, const FVector& InLinearVelocity = FVector(0.f), const FVector& InAngularVelocity = FVector(0.f)) {
-		return SpawnItemActor_Internal(WorldContextObject, Transform, Item, FItemLoadDelegate::CreateUObject(InObj, DelegateToCall), InLinearVelocity, InAngularVelocity);
-	}
-	
-	static bool SpawnItemActor(const UObject* WorldContextObject, const FTransform& Transform, UItem* Item, const TFunction<void(AItemActor*)>& Function, const FVector& InLinearVelocity = FVector(0.f), const FVector& InAngularVelocity = FVector(0.f)) {
-		return SpawnItemActor_Internal(WorldContextObject, Transform, Item, FItemLoadDelegate::CreateLambda(Function), InLinearVelocity, InAngularVelocity);
-	}
+	static bool SpawnItemActor(const UObject* WorldContextObject, const FTransform& Transform, UItem* Item, const FVector& InLinearVelocity = FVector(0.f), const FVector& InAngularVelocity = FVector(0.f), const TDelegateWrapper<FItemLoadDelegate>& OnItemLoadComplete = {});
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
 	UCullStaticMeshComponent* StaticMeshComponent;
@@ -80,9 +69,7 @@ protected:
 	FObjectData ItemData;
 
 private:
-
-	static bool SpawnItemActor_Internal(const UObject* WorldContextObject, const FTransform& Transform, UItem* Item, FItemLoadDelegate OnItemLoadComplete, FVector InLinearVelocity = FVector(0.f), FVector InAngularVelocity = FVector(0.f));
-
+	
 	UPROPERTY()
 	UStaticMesh* StaticMesh = nullptr;
 
@@ -90,7 +77,7 @@ private:
 	
 	FVector AngularVelocity = FVector::ZeroVector;
 
-	FItemLoadDelegate OnItemLoadComplete;
+	TDelegateWrapper<FItemLoadDelegate> OnItemLoadComplete;
 	
 };
 

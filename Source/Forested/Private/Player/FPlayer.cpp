@@ -186,7 +186,7 @@ void AFPlayer::ResetMousePosition() const {
 	PlayerController->SetMouseLocation(SizeX/2,SizeY/2);
 }
 
-void AFPlayer::InterpolatePlayerTo_Internal(const FTransform& Transform, float Time, TEnumAsByte<EEasingFunc::Type> EasingFunc, FInterpolatePlayerDelegate OnUpdate, FInterpolatePlayerDelegate OnComplete) {
+void AFPlayer::InterpolatePlayerTo(const FTransform& Transform, const float Time, const TEnumAsByte<EEasingFunc::Type> EasingFunc, const TDelegateWrapper<FInterpolatePlayerDelegate>& OnUpdate, const TDelegateWrapper<FInterpolatePlayerDelegate>& OnComplete) {
 	const FVector& OriginalLocation = GetActorLocation();
 	const FRotator& OriginalRotation = GetControlRotation();
 	SKY->AddTimer(Time, [this, OnComplete](const float CurrentTime, const float ExecuteTime) {
