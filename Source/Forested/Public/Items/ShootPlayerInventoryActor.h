@@ -71,13 +71,13 @@ public:
 	bool TraceShot(FHitResult& OutHit, FVector ShootLocation, float Rotation, float InSpread);
 	
 	UFUNCTION(BlueprintCallable, meta = (AdvancedDisplay = 2), Category = "Shoot Player Inventory Actor")
-	bool Shoot(UAnimMontage* Montage, FViewmodelVector ShootLocation, float PlayRate = 1.f, float StartingPosition = 0.f, bool Aimed = false);
+	bool Shoot(UAnimMontage* Montage, FViewmodelVector ShootLocation, float PlayRate = 1.f, float StartingPosition = 0.f, bool bCheckGroup = true, bool Aimed = false);
 	
 	UFUNCTION(BlueprintCallable, meta = (AdvancedDisplay = 1), Category = "Shoot Player Inventory Actor")
-	bool Reload(UAnimMontage* Montage, float PlayRate = 1.f, float StartingPosition = 0.f, bool FullReload = true, int BulletsToAdd = 0);
+	bool Reload(UAnimMontage* Montage, float PlayRate = 1.f, float StartingPosition = 0.f, bool bCheckGroup = true, bool FullReload = true, int BulletsToAdd = 0);
 	
 	UFUNCTION(BlueprintCallable, meta = (AdvancedDisplay = 1), Category = "Shoot Player Inventory Actor")
-	bool Aim(UAnimMontage* Montage, float PlayRate = 1.f, float StartingPosition = 0.f);
+	bool Aim(UAnimMontage* Montage, float PlayRate = 1.f, float StartingPosition = 0.f, bool bCheckGroup = true);
 
 	UFUNCTION(BlueprintCallable, Category = "Shoot Player Inventory Actor")
 	bool UnAim(UAnimMontage* Montage);
