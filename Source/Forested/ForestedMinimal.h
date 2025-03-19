@@ -76,7 +76,7 @@
 //macro used to put messages in the output log (only outputs in editor)
 #if WITH_EDITOR
 #define LOG_EDITOR(x, ...) \
-	LOG(x, ##__VA_ARGS__);
+	UE_LOG(ForestedEditor, Log, TEXT(x), ##__VA_ARGS__)
 #else
 #define LOG_EDITOR(x, ...)
 #endif
@@ -84,7 +84,7 @@
 //macro used to put warnings in the output log (only outputs in editor)
 #if WITH_EDITOR
 #define LOG_EDITOR_WARNING(x, ...) \
-	LOG_WARNING(x, ##__VA_ARGS__);
+	UE_LOG(ForestedEditor, Warning, TEXT(x), ##__VA_ARGS__)
 #else
 #define LOG_EDITOR_WARNING(x, ...)
 #endif
@@ -92,7 +92,7 @@
 //macro used to put errors in the output log (only outputs in editor)
 #if WITH_EDITOR
 #define LOG_EDITOR_ERROR(x, ...) \
-	LOG_ERROR(x, ##__VA_ARGS__);
+	UE_LOG(ForestedEditor, Error, TEXT(x), ##__VA_ARGS__)
 #else
 #define LOG_EDITOR_ERROR(x, ...)
 #endif
@@ -100,7 +100,7 @@
 //macro used to put errors in the output log and crash the game, only use if absolutely necessary (only outputs in editor)
 #if WITH_EDITOR
 #define LOG_EDITOR_FATAL(x, ...) \
-	LOG_FATAL(x, ##__VA_ARGS__);
+	UE_LOG(ForestedEditor, Fatal, TEXT(x), ##__VA_ARGS__)
 #else
 #define LOG_EDITOR_FATAL(x, ...)
 #endif

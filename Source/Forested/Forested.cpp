@@ -2,7 +2,9 @@
 #include "Modules/ModuleManager.h"
 
 IMPLEMENT_PRIMARY_GAME_MODULE( FDefaultGameModuleImpl, Forested, "Forested" );
+
 DEFINE_LOG_CATEGORY(Forested);
+DEFINE_LOG_CATEGORY(ForestedEditor);
 
 // 'Real Artists Ship' - Steve Jobs
 //means get it done
