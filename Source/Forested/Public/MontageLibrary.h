@@ -21,7 +21,7 @@ class FORESTED_API UMontageLibrary : public UBlueprintFunctionLibrary {
 
 public:
 	
-	static bool StartMontage(const USkeletalMeshComponent* SkeletalMeshComponent, UAnimMontage* Montage, float PlayRate = 1.f, float StartingPosition = 0.f, bool bCheckGroup = false, const TDelegateWrapper<FOnMontageEnded>& OnComplete = {}, const TDelegateWrapper<FOnMontageBlendingOut>& OnBlendOut = {}, const TDelegateWrapper<FOnMontageNotify>& OnNotifyBegin = {}, const TDelegateWrapper<FOnMontageNotify>& OnNotifyEnd = {});
+	static bool StartMontage(const USkeletalMeshComponent* SkeletalMeshComponent, UAnimMontage* Montage, float PlayRate = 1.f, float StartingPosition = 0.f, bool bCheckGroup = true, const TDelegateWrapper<FOnMontageEnded>& OnComplete = {}, const TDelegateWrapper<FOnMontageBlendingOut>& OnBlendOut = {}, const TDelegateWrapper<FOnMontageNotify>& OnNotifyBegin = {}, const TDelegateWrapper<FOnMontageNotify>& OnNotifyEnd = {});
 
 	UFUNCTION(BlueprintCallable, Category = "Montage Library")
 	static bool PauseMontage(USkeletalMeshComponent* SkeletalMeshComponent, const UAnimMontage* Montage); 
@@ -141,7 +141,7 @@ protected:
 
 	float StartTimeSeconds = 0.f;
 
-	bool bCheckGroup = false;
+	bool bCheckGroup = true;
 
 	bool bInterruptedCalledBeforeBlendingOut = false;
 	
@@ -164,7 +164,7 @@ protected:
 	FOnMontageStartDelegate OnNotifyEnd;
 	
 	UFUNCTION(BlueprintCallable, /*meta = (BlueprintInternalUseOnly = "true"),*/ Category = "Montage Library")
-	static UStartMontageAsyncAction* StartMontage(bool& OutSuccess, USkeletalMeshComponent* SkeletalMeshComponent, UAnimMontage* Montage, bool bCheckGroup = false, float PlayRate = 1.f, float StartingPosition = 0.f);
+	static UStartMontageAsyncAction* StartMontage(bool& OutSuccess, USkeletalMeshComponent* SkeletalMeshComponent, UAnimMontage* Montage, bool bCheckGroup = true, float PlayRate = 1.f, float StartingPosition = 0.f);
 
 	virtual void Activate() override;
 	
