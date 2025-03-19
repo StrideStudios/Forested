@@ -66,7 +66,7 @@ bool AShootPlayerInventoryActor::TraceShot(FHitResult& OutHit, const FVector Sho
 	return GetWorld()->LineTraceSingleByChannel(OutHit, ShootLocation, EndLocation, ECC_Visibility, Params);
 }
 
-bool AShootPlayerInventoryActor::Shoot(UAnimMontage* Montage, const FViewmodelVector ShootLocation, const float PlayRate, const float StartingPosition, const bool bCheckGroup, const bool Aimed) {
+bool AShootPlayerInventoryActor::Shoot(UAnimMontage* Montage, const FViewmodelVector ShootLocation, const bool bCheckGroup, const float PlayRate, const float StartingPosition, const bool Aimed) {
 	if (IsReloading() || IsShooting()) return false;
 	UShootItem* ShootItem;
 	if (!GetShootItem(ShootItem) || ShootItem->Bullets <= 0) return false;
@@ -98,7 +98,7 @@ bool AShootPlayerInventoryActor::Shoot(UAnimMontage* Montage, const FViewmodelVe
 	return false;
 }
 
-bool AShootPlayerInventoryActor::Reload(UAnimMontage* Montage, const float PlayRate, const float StartingPosition, const bool bCheckGroup, const bool FullReload, const int BulletsToAdd) {
+bool AShootPlayerInventoryActor::Reload(UAnimMontage* Montage, const bool bCheckGroup, const float PlayRate, const float StartingPosition, const bool FullReload, const int BulletsToAdd) {
 	if (IsReloading() || IsShooting()) return false;
 	UShootItem* ShootItem;
 	if (!GetShootItem(ShootItem) || ShootItem->Bullets >= MaxBullets) return false;
@@ -116,7 +116,7 @@ bool AShootPlayerInventoryActor::Reload(UAnimMontage* Montage, const float PlayR
 	return false;
 }
 
-bool AShootPlayerInventoryActor::Aim(UAnimMontage* Montage, const float PlayRate, const float StartingPosition, const bool bCheckGroup) {
+bool AShootPlayerInventoryActor::Aim(UAnimMontage* Montage, const bool bCheckGroup, const float PlayRate, const float StartingPosition) {
 	if (IsReloading() || IsShooting()) return false;
 	if (UMontageLibrary::StartMontage(GetPlayer()->GetMesh(), Montage, PlayRate, StartingPosition, bCheckGroup)) {
 		if (ShootWidget) {
