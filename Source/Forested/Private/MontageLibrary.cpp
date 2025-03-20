@@ -133,14 +133,29 @@ bool UMontageLibrary::IsMontageActive_Internal(const FAnimMontageInstance* Monta
 	return IncludeBlendingOut || !MontageInstance->bEnableAutoBlendOut || MontageInstance->GetPosition() < MontageInstance->Montage->GetPlayLength() - MontageInstance->Montage->BlendOut.GetBlendTime();
 }
 
+void UStartMontage::BeginDestroy() {
+	UObject::BeginDestroy();
+	UnbindDelegates();
+}
+
+void UStartMontage::ReceiveOnMontageEnded(UAnimMontage* Montage, const bool bInterrupted) {
+	OnMontageEnded->ExecuteIfBound(Montage, bInterrupted);
+	UnbindDelegates();
+}
+
+void UStartMontage::ReceiveOnMontageBlendingOut(UAnimMontage* Montage, const bool bInterrupted) {
+	OnMontageBlendingOut->ExecuteIfBound(Montage, bInterrupted);
+}
+
 void UStartMontage::OnNotifyBeginReceived(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointNotifyPayload) {
-	if (OnNotifyBegin.IsBound())
-		OnNotifyBegin.ExecuteIfBound(NotifyName);
+	if (OnNotifyBegin->IsBound())
+		OnNotifyBegin->ExecuteIfBound(NotifyName);
+	PRINT("Notify Began " + NotifyName.ToString());
 }
 
 void UStartMontage::OnNotifyEndReceived(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointNotifyPayload) {
-	if (OnNotifyEnd.IsBound())
-		OnNotifyEnd.ExecuteIfBound(NotifyName);
+	if (OnNotifyEnd->IsBound())
+		OnNotifyEnd->ExecuteIfBound(NotifyName);
 }
 
 bool UStartMontage::StartMontage(const USkeletalMeshComponent* SkeletalMeshComponent, UAnimMontage* Montage, const float PlayRate, const float StartingPosition, const bool bCheckGroup) {
@@ -165,18 +180,30 @@ bool UStartMontage::StartMontage(const USkeletalMeshComponent* SkeletalMeshCompo
 		return false;
 	}
 
-	UAnimInstance* AnimInstance = SkeletalMeshComponent->GetAnimInstance();
-	const float f = AnimInstance->Montage_Play(Montage, PlayRate, EMontagePlayReturnType::MontageLength, StartingPosition);
+	AnimInstancePtr = SkeletalMeshComponent->GetAnimInstance();
+	const float f = AnimInstancePtr->Montage_Play(Montage, PlayRate, EMontagePlayReturnType::MontageLength, StartingPosition);
 	if (f > 0.f) {
-		AnimInstance->Montage_SetEndDelegate(OnMontageEnded, Montage);
-		AnimInstance->Montage_SetBlendingOutDelegate(OnMontageBlendingOut, Montage);
-		AnimInstance->OnPlayMontageNotifyBegin.AddDynamic(this, &UStartMontage::OnNotifyBeginReceived);
-		AnimInstance->OnPlayMontageNotifyEnd.AddDynamic(this, &UStartMontage::OnNotifyEndReceived);
+		
+		OnMontageEndedDelegate = FOnMontageEnded::CreateUObject(this, &UStartMontage::ReceiveOnMontageEnded);
+		AnimInstancePtr->Montage_SetEndDelegate(OnMontageEndedDelegate, Montage);
+
+		OnMontageBlendingOutDelegate = FOnMontageBlendingOut::CreateUObject(this, &UStartMontage::ReceiveOnMontageBlendingOut);
+		AnimInstancePtr->Montage_SetBlendingOutDelegate(OnMontageBlendingOutDelegate, Montage);
+		
+		AnimInstancePtr->OnPlayMontageNotifyBegin.AddDynamic(this, &UStartMontage::OnNotifyBeginReceived);
+		AnimInstancePtr->OnPlayMontageNotifyEnd.AddDynamic(this, &UStartMontage::OnNotifyEndReceived);
 	} else {
 		LOG_EDITOR_WARNING("Unknown Montage Failure.");
 	}
 	
 	return f > 0.f;
+}
+
+void UStartMontage::UnbindDelegates() {
+	if (UAnimInstance* AnimInstance = AnimInstancePtr.Get()) {
+		AnimInstance->OnPlayMontageNotifyBegin.RemoveDynamic(this, &UStartMontage::OnNotifyBeginReceived);
+		AnimInstance->OnPlayMontageNotifyEnd.RemoveDynamic(this, &UStartMontage::OnNotifyEndReceived);
+	}
 }
 
 UStartMontageAsyncAction* UStartMontageAsyncAction::StartMontage(bool& OutSuccess, USkeletalMeshComponent* SkeletalMeshComponent, UAnimMontage* Montage, const bool bCheckGroup, const float PlayRate, const float StartingPosition) {

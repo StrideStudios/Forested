@@ -97,6 +97,8 @@ class FORESTED_API UStartMontage : public UObject {
 	 * parameters
 	 */
 
+	TWeakObjectPtr<UAnimInstance> AnimInstancePtr;
+
 	TDelegateWrapper<FOnMontageNotify> OnNotifyBegin;
 
 	TDelegateWrapper<FOnMontageNotify> OnNotifyEnd;
@@ -105,11 +107,23 @@ class FORESTED_API UStartMontage : public UObject {
 
 	TDelegateWrapper<FOnMontageBlendingOut> OnMontageBlendingOut;
 
+	FOnMontageEnded OnMontageEndedDelegate;
+
+	FOnMontageBlendingOut OnMontageBlendingOutDelegate;
+
 	bool* OutSuccess;
 
 	/*
 	 * functions
 	 */
+
+	virtual void BeginDestroy() override;
+
+	UFUNCTION()
+	void ReceiveOnMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+
+	UFUNCTION()
+	void ReceiveOnMontageBlendingOut(UAnimMontage* Montage, bool bInterrupted);
 
 	UFUNCTION()
 	void OnNotifyBeginReceived(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointNotifyPayload);
@@ -118,7 +132,9 @@ class FORESTED_API UStartMontage : public UObject {
 	void OnNotifyEndReceived(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointNotifyPayload);
 	
 	bool StartMontage(const USkeletalMeshComponent* SkeletalMeshComponent, UAnimMontage* Montage, float PlayRate = 1.f, float StartingPosition = 0.f, bool bCheckGroup = true);
-	
+
+	void UnbindDelegates();
+
 };
 
 UCLASS()

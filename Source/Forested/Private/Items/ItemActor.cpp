@@ -92,7 +92,7 @@ void AItemActor::Init() {
 	} else {
 		Execute_Unload(this);
 	}
-	OnItemLoadComplete.ExecuteIfBound(this);
+	OnItemLoadComplete->ExecuteIfBound(this);
 }
 
 bool AItemActor::Selected_Implementation(AFPlayer* Player, const FHitResult& HitResult, const float HeldTime) {

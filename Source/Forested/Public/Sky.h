@@ -37,11 +37,11 @@ struct FTimedEvents {
 	bool Pending = false;
 
 	FORCEINLINE void EventCompleted(const float TimeInSeconds) const {
-		Completed.Execute(TimeInSeconds, ExecuteTime);
+		Completed->Execute(TimeInSeconds, ExecuteTime);
 	}
 
 	FORCEINLINE void EventUpdate(const float TimeInSeconds) const {
-		Update.Execute(TimeInSeconds, ExecuteTime);
+		Update->Execute(TimeInSeconds, ExecuteTime);
 	}
 
 	//order by execution time

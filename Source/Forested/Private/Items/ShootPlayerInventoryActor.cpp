@@ -68,6 +68,7 @@ bool AShootPlayerInventoryActor::TraceShot(FHitResult& OutHit, const FViewmodelD
 	return GetWorld()->LineTraceSingleByChannel(OutHit, StartLocation, EndLocation, ECC_Visibility, Params);
 }
 
+//TODO: async node
 bool AShootPlayerInventoryActor::Shoot(UAnimMontage* Montage, const FViewmodelData& ViewmodelData, const FVector ShootLocation, const bool bCheckGroup, const float PlayRate, const float StartingPosition, const bool Aimed) {
 	if (IsReloading() || IsShooting()) return false;
 	UShootItem* ShootItem;
@@ -100,11 +101,16 @@ bool AShootPlayerInventoryActor::Shoot(UAnimMontage* Montage, const FViewmodelDa
 	return false;
 }
 
+//TODO: async node
 bool AShootPlayerInventoryActor::Reload(UAnimMontage* Montage, const bool bCheckGroup, const float PlayRate, const float StartingPosition, const bool FullReload, const int BulletsToAdd) {
 	if (IsReloading() || IsShooting()) return false;
 	UShootItem* ShootItem;
 	if (!GetShootItem(ShootItem) || ShootItem->Bullets >= MaxBullets) return false;
-	if (UMontageLibrary::StartMontage(GetPlayer()->GetMesh(), Montage, PlayRate, StartingPosition, bCheckGroup)) {
+	const bool bSuccess = UMontageLibrary::StartMontage(GetPlayer()->GetMesh(), Montage, PlayRate, StartingPosition, bCheckGroup, {}, {}, [this, BulletsToAdd](FName NotifyName) {
+		if (NotifyName == "BulletLoad")
+			OnBulletLoaded(BulletsToAdd);
+	});
+	if (bSuccess) {
 		ReloadMontage = Montage;
 		
 		if (FullReload) {

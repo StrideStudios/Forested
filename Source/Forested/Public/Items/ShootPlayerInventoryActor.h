@@ -96,6 +96,9 @@ public:
 	void EndShot();
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Shoot Player Inventory Actor")
+	void OnBulletLoaded(int Bullets);
+	
+	UFUNCTION(BlueprintImplementableEvent, Category = "Shoot Player Inventory Actor")
 	void EndReload();
 
 protected:

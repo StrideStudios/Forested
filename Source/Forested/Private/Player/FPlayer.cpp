@@ -190,14 +190,14 @@ void AFPlayer::InterpolatePlayerTo(const FTransform& Transform, const float Time
 	const FVector& OriginalLocation = GetActorLocation();
 	const FRotator& OriginalRotation = GetControlRotation();
 	SKY->AddTimer(Time, [this, OnComplete](const float CurrentTime, const float ExecuteTime) {
-		OnComplete.ExecuteIfBound(this);
+		OnComplete->ExecuteIfBound(this);
 	}, [this, OnUpdate, Time, OriginalLocation, OriginalRotation, Transform, EasingFunc](const float CurrentTime, const float ExecuteTime) {
 		const float Amount = (CurrentTime - (ExecuteTime - Time)) / Time;
 		const FVector NewLocation = UKismetMathLibrary::VEase(OriginalLocation, Transform.GetLocation(), Amount, EasingFunc);
 		const FRotator NewRotator = UKismetMathLibrary::REase(OriginalRotation, Transform.GetRotation().Rotator(), Amount, true, EasingFunc);
 		SetActorLocation(NewLocation);
 		GetController()->SetControlRotation(NewRotator);
-		OnUpdate.ExecuteIfBound(this);
+		OnUpdate->ExecuteIfBound(this);
 	});
 }
 

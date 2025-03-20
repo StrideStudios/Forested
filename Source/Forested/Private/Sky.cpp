@@ -285,7 +285,7 @@ void ASky::SetRainValue(const float InRainValue) {
 }
 
 void ASky::AddTimedEvent(const float ExecuteTime, const TDelegateWrapper<FTimedEventDelegate>& Complete) {
-	if (!Complete.IsBound()) {
+	if (!Complete->IsBound()) {
 		LOG_ERROR("Invalid delegate given, make sure callback is valid");
 		return;
 	}
@@ -313,7 +313,7 @@ void ASky::AddTimedEvent(const float ExecuteTime, const TDelegateWrapper<FTimedE
 }
 
 void ASky::AddTimer(const float ExecuteTime, const TDelegateWrapper<FTimedEventDelegate>& Complete, const TDelegateWrapper<FTimedEventDelegate>& Update) {
-	if (!Complete.IsBound() || !Update.IsBound()) {
+	if (!Complete->IsBound() || !Update->IsBound()) {
 		LOG_ERROR("Invalid delegate given, make sure callback is valid");
 		return;
 	}
@@ -341,7 +341,7 @@ void ASky::AddTimer(const float ExecuteTime, const TDelegateWrapper<FTimedEventD
 }
 
 void ASky::AddFrameDelay(const TDelegateWrapper<FFrameDelayDelegate>& Complete) {
-	if (!Complete.IsBound()) {
+	if (!Complete->IsBound()) {
 		LOG_ERROR("Invalid delegate given, make sure callback is valid");
 		return;
 	}

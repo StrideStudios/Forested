@@ -56,7 +56,7 @@ public:
 	static TSharedPtr<FStreamableHandle> LoadAsync(const TArray<FSoftPtr>& TargetsToStream, const TDelegateWrapper<FStreamableDelegate>& Delegate) {
 		const TArray<FSoftObjectPath> Targets = GetInvalidTargets(TargetsToStream);
 		if (!Targets.Num()) {
-			Delegate.Execute();
+			Delegate->Execute();
 			return {};
 		}
 		return LoadAsync_Internal(Targets, Delegate);
