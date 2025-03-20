@@ -10,18 +10,30 @@
 //Sahil Dhanju
 
 FViewmodelVector::operator FVector() const {
+	return ConvertToVector(ViewmodelData, Vector);
+}
+
+FVector FViewmodelVector::ConvertToVector(const FViewmodelData ViewmodelData, const FVector Vector) {
 	FMatrix Matrix = FTransform(Vector).ToMatrixWithScale();
 	UViewmodelMeshes::CalculateViewmodelMatrix(PLAYER->GetPlayerController(), ViewmodelData, Matrix);
 	return FTransform(Matrix).GetLocation();
 }
 
-FViewmodelRotator::operator FRotator() const {
+FViewmodelRotator::operator FQuat() const {
+	return ConvertToQuat(ViewmodelData, Rotation.Quaternion());
+}
+
+FQuat FViewmodelRotator::ConvertToQuat(const FViewmodelData ViewmodelData, const FQuat Rotation) {
 	FMatrix Matrix = FTransform(Rotation).ToMatrixWithScale();
 	UViewmodelMeshes::CalculateViewmodelMatrix(PLAYER->GetPlayerController(), ViewmodelData, Matrix);
-	return FTransform(Matrix).Rotator();
+	return FTransform(Matrix).GetRotation();
 }
 
 FViewmodelTransform::operator FTransform() const {
+	return ConvertToTransform(ViewmodelData, Transform);
+}
+
+FTransform FViewmodelTransform::ConvertToTransform(const FViewmodelData ViewmodelData, const FTransform Transform) {
 	FMatrix Matrix = Transform.ToMatrixWithScale();
 	UViewmodelMeshes::CalculateViewmodelMatrix(PLAYER->GetPlayerController(), ViewmodelData, Matrix);
 	return FTransform(Matrix);
@@ -32,7 +44,11 @@ FVector UViewmodelMeshes::Conv_ViewmodelVectorToVector(const FViewmodelVector& V
 }
 
 FRotator UViewmodelMeshes::Conv_ViewmodelRotatorToRotator(const FViewmodelRotator& Rotator) {
-	return FRotator(Rotator);
+	return FQuat(Rotator).Rotator();
+}
+
+FQuat UViewmodelMeshes::Conv_ViewmodelRotatorToQuat(const FViewmodelRotator& Rotator) {
+	return FQuat(Rotator);
 }
 
 FTransform UViewmodelMeshes::Conv_ViewmodelTransformToTransform(const FViewmodelTransform& Transform) {

@@ -68,10 +68,10 @@ public:
 	 */
 	
 	UFUNCTION(BlueprintCallable, meta = (AdvancedDisplay = 2), Category = "Shoot Player Inventory Actor")
-	bool TraceShot(FHitResult& OutHit, FVector ShootLocation, float Rotation, float InSpread);
+	bool TraceShot(FHitResult& OutHit, const FViewmodelData& ViewmodelData, FVector ShootLocation, float Rotation, float InSpread);
 	
 	UFUNCTION(BlueprintCallable, meta = (AdvancedDisplay = 2), Category = "Shoot Player Inventory Actor")
-	bool Shoot(UAnimMontage* Montage, FViewmodelVector ShootLocation, bool bCheckGroup = true, float PlayRate = 1.f, float StartingPosition = 0.f, bool Aimed = false);
+	bool Shoot(UAnimMontage* Montage, const FViewmodelData& ViewmodelData, FVector ShootLocation, bool bCheckGroup = true, float PlayRate = 1.f, float StartingPosition = 0.f, bool Aimed = false);
 	
 	UFUNCTION(BlueprintCallable, meta = (AdvancedDisplay = 1), Category = "Shoot Player Inventory Actor")
 	bool Reload(UAnimMontage* Montage, bool bCheckGroup = true, float PlayRate = 1.f, float StartingPosition = 0.f, bool FullReload = true, int BulletsToAdd = 0);
@@ -83,7 +83,7 @@ public:
 	bool UnAim(UAnimMontage* Montage);
 
 	UFUNCTION(BlueprintCallable, Category = "Shoot Player Inventory Actor")
-	void TransformWidgetToShootPoint(float DeltaSeconds, FVector ShootLocation);
+	void TransformWidgetToShootPoint(float DeltaSeconds, const FViewmodelData& ViewmodelData, FVector ShootLocation);
 	
 	/**
 	 * Blueprint Implementable Functions
@@ -91,9 +91,6 @@ public:
 	
 	UFUNCTION(BlueprintImplementableEvent, Category = "Shoot Player Inventory Actor")
 	USceneComponent* GetMesh();
-
-	UFUNCTION(BlueprintImplementableEvent, Category = "Shoot Player Inventory Actor")
-	FViewmodelData GetViewmodelData();
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Shoot Player Inventory Actor")
 	void EndShot();

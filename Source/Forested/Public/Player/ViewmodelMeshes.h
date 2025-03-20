@@ -40,6 +40,8 @@ struct FViewmodelVector {
 	FVector Vector;
 
 	operator FVector() const;
+
+	static FVector ConvertToVector(const FViewmodelData ViewmodelData, const FVector Vector);
 	
 };
 
@@ -55,7 +57,9 @@ struct FViewmodelRotator {
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Viewmodel")
 	FRotator Rotation;
 
-	operator FRotator() const;
+	operator FQuat() const;
+
+	static FQuat ConvertToQuat(const FViewmodelData ViewmodelData, const FQuat Rotation);
 	
 };
 
@@ -72,6 +76,8 @@ struct FViewmodelTransform {
 	FTransform Transform;
 
 	operator FTransform() const;
+
+	static FTransform ConvertToTransform(const FViewmodelData ViewmodelData, const FTransform Transform);
 	
 };
 
@@ -88,6 +94,10 @@ public:
 	//correct a rotator attached to camera to fit with a certain viewmodel fov or scale
 	UFUNCTION(BlueprintCallable, BlueprintPure, meta = (DisplayName = "Convert To Rotator", CompactNodeTitle = "->", BlueprintAutocast), Category = "Viewmodel")
 	static FRotator Conv_ViewmodelRotatorToRotator(const FViewmodelRotator& Rotator);
+
+	//correct a quaternion attached to camera to fit with a certain viewmodel fov or scale
+	UFUNCTION(BlueprintCallable, BlueprintPure, meta = (DisplayName = "Convert To Rotator", CompactNodeTitle = "->", BlueprintAutocast), Category = "Viewmodel")
+	static FQuat Conv_ViewmodelRotatorToQuat(const FViewmodelRotator& Rotator);
 	
 	//correct a transform attached to camera to fit with a certain viewmodel fov or scale
 	UFUNCTION(BlueprintCallable, BlueprintPure, meta = (DisplayName = "Convert To Transform", CompactNodeTitle = "->", BlueprintAutocast), Category = "Viewmodel")

@@ -43,7 +43,7 @@ void AShootPlayerInventoryActor::OnMontageBlendOut(const UAnimMontage* Montage, 
 	}
 }
 
-bool AShootPlayerInventoryActor::TraceShot(FHitResult& OutHit, const FVector ShootLocation, const float Rotation, const float InSpread) {
+bool AShootPlayerInventoryActor::TraceShot(FHitResult& OutHit, const FViewmodelData& ViewmodelData, const FVector ShootLocation, const float Rotation, const float InSpread) {
 	if (!GetWorld() || !GetMesh()) return false;
 
 	const float TrueSpread = InSpread * Range;
@@ -54,7 +54,9 @@ bool AShootPlayerInventoryActor::TraceShot(FHitResult& OutHit, const FVector Sho
 
 	const FVector EndDistance = GetMesh()->GetForwardVector() * Range;
 
-	const FVector EndLocation = ShootLocation + EndDistance + TraceLocationX + TraceLocationY;
+	const FVector StartLocation = FViewmodelVector::ConvertToVector(ViewmodelData, ShootLocation);
+	
+	const FVector EndLocation = FViewmodelVector::ConvertToVector(ViewmodelData, StartLocation + EndDistance + TraceLocationX + TraceLocationY);
 
 	FCollisionQueryParams Params;
 	Params.bFindInitialOverlaps = false;
@@ -63,10 +65,10 @@ bool AShootPlayerInventoryActor::TraceShot(FHitResult& OutHit, const FVector Sho
 	Params.bTraceComplex = true;
 	Params.bIgnoreTouches = true;
 	
-	return GetWorld()->LineTraceSingleByChannel(OutHit, ShootLocation, EndLocation, ECC_Visibility, Params);
+	return GetWorld()->LineTraceSingleByChannel(OutHit, StartLocation, EndLocation, ECC_Visibility, Params);
 }
 
-bool AShootPlayerInventoryActor::Shoot(UAnimMontage* Montage, const FViewmodelVector ShootLocation, const bool bCheckGroup, const float PlayRate, const float StartingPosition, const bool Aimed) {
+bool AShootPlayerInventoryActor::Shoot(UAnimMontage* Montage, const FViewmodelData& ViewmodelData, const FVector ShootLocation, const bool bCheckGroup, const float PlayRate, const float StartingPosition, const bool Aimed) {
 	if (IsReloading() || IsShooting()) return false;
 	UShootItem* ShootItem;
 	if (!GetShootItem(ShootItem) || ShootItem->Bullets <= 0) return false;
@@ -85,7 +87,7 @@ bool AShootPlayerInventoryActor::Shoot(UAnimMontage* Montage, const FViewmodelVe
 			const float RandomSpread = FMath::RandRange(0.0, Aimed ? Spread.Y : Spread.X);
 
 			FHitResult HitResult;
-			if (TraceShot(HitResult, ShootLocation, RandomRotation, RandomSpread)) {
+			if (TraceShot(HitResult, ViewmodelData, ShootLocation, RandomRotation, RandomSpread)) {
 				float Damage = Aimed ? MaxDamage.Y : MaxDamage.X;
 				Damage = (1.f - HitResult.Distance / Range) * Damage;
 				UDamageLibrary::ApplyDamage(HitResult.GetActor(), GetPlayer(), HitResult, Damage, EDamageType::Gun);
@@ -143,14 +145,16 @@ bool AShootPlayerInventoryActor::UnAim(UAnimMontage* Montage) {
 	return false;
 }
 
-void AShootPlayerInventoryActor::TransformWidgetToShootPoint(const float DeltaSeconds, const FVector ShootLocation) {
-	FViewmodelVector ViewmodelShootPoint;
-	ViewmodelShootPoint.Vector = ShootLocation;
-	ViewmodelShootPoint.ViewmodelData = GetViewmodelData();
+void AShootPlayerInventoryActor::TransformWidgetToShootPoint(const float DeltaSeconds, const FViewmodelData& ViewmodelData, const FVector ShootLocation) {
 
 	FHitResult HitResult;
-	const bool bHit = TraceShot(HitResult, ViewmodelShootPoint, 0.f, 0.f);
-	const FVector TargetLocation = bHit ? HitResult.Location : ShootLocation + GetMesh()->GetForwardVector() * Range;
+	const bool bHit = TraceShot(HitResult, ViewmodelData, ShootLocation, 0.f, 0.f);
+	FVector TargetLocation;
+	if (bHit) {
+		TargetLocation = HitResult.Location;
+	} else {
+		TargetLocation = FViewmodelVector::ConvertToVector(ViewmodelData, FViewmodelVector::ConvertToVector(ViewmodelData, ShootLocation) + GetMesh()->GetForwardVector() * Range);
+	}
 
 	FVector2D TargetTranslation;
 	if (UGameplayStatics::ProjectWorldToScreen(GetPlayer()->GetPlayerController(), TargetLocation, TargetTranslation, true)) {
