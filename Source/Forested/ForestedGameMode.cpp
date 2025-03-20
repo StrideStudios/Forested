@@ -49,19 +49,19 @@ void AForestedGameMode::EndPlay(const EEndPlayReason::Type EndPlayReason) {
 
 void AForestedGameMode::StartGame() {
 	bIsGameStarted = true;
-	PLAYER->GetHud()->SetGameHud();
+	if (PLAYER) PLAYER->GetHud()->SetGameHud();
 }
 
 void AForestedGameMode::ResumeGame() const {
-	PLAYER->GetHud()->SetGameHud();
+	if (PLAYER) PLAYER->GetHud()->SetGameHud();
 }
 
 void AForestedGameMode::PauseGame() const {
-	PLAYER->GetHud()->SetMenuHud();
+	if (PLAYER) PLAYER->GetHud()->SetMenuHud();
 }
 
 void AForestedGameMode::QuitGame() const {
-	UKismetSystemLibrary::QuitGame(this, PLAYER->GetPlayerController(), EQuitPreference::Quit, false);
+	if (PLAYER) UKismetSystemLibrary::QuitGame(this, PLAYER->GetPlayerController(), EQuitPreference::Quit, false);
 }
 
 void AForestedGameMode::InitSaveGame() {

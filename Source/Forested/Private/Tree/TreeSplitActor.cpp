@@ -155,7 +155,7 @@ void ATreeSplitActor::AttachComponents() {
 		if (TrunkComponents.IsValidIndex(i + 1))
 			TrunkComponent->AttachToComponent(TrunkComponents[i + 1], FAttachmentTransformRules::KeepWorldTransform);
 	}
-	SetComponentSimulatePhysics(TrunkComponents.Last(), PLAYER->IsActorLoaded(this));
+	if (PLAYER) SetComponentSimulatePhysics(TrunkComponents.Last(), PLAYER->IsActorLoaded(this));
 	UpdateSphereBounds();
 }
 

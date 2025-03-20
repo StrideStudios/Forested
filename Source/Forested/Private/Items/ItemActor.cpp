@@ -87,7 +87,7 @@ void AItemActor::Init() {
 	SphereComponent->SetSphereRadius(Bounds.SphereRadius);
 	SphereComponent->SetRelativeLocation(Bounds.Origin);
 	ReceiveInit();
-	if (PLAYER->IsActorLoaded(this)) {
+	if (PLAYER && PLAYER->IsActorLoaded(this)) {
 		Execute_Load(this);
 	} else {
 		Execute_Unload(this);

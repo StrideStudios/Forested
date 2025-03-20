@@ -15,7 +15,7 @@ FViewmodelVector::operator FVector() const {
 
 FVector FViewmodelVector::ConvertToVector(const FViewmodelData ViewmodelData, const FVector Vector) {
 	FMatrix Matrix = FTransform(Vector).ToMatrixWithScale();
-	UViewmodelMeshes::CalculateViewmodelMatrix(PLAYER->GetPlayerController(), ViewmodelData, Matrix);
+	if (PLAYER) UViewmodelMeshes::CalculateViewmodelMatrix(PLAYER->GetPlayerController(), ViewmodelData, Matrix);
 	return FTransform(Matrix).GetLocation();
 }
 
@@ -25,7 +25,7 @@ FViewmodelRotator::operator FQuat() const {
 
 FQuat FViewmodelRotator::ConvertToQuat(const FViewmodelData ViewmodelData, const FQuat Rotation) {
 	FMatrix Matrix = FTransform(Rotation).ToMatrixWithScale();
-	UViewmodelMeshes::CalculateViewmodelMatrix(PLAYER->GetPlayerController(), ViewmodelData, Matrix);
+	if (PLAYER) UViewmodelMeshes::CalculateViewmodelMatrix(PLAYER->GetPlayerController(), ViewmodelData, Matrix);
 	return FTransform(Matrix).GetRotation();
 }
 
@@ -35,7 +35,7 @@ FViewmodelTransform::operator FTransform() const {
 
 FTransform FViewmodelTransform::ConvertToTransform(const FViewmodelData ViewmodelData, const FTransform Transform) {
 	FMatrix Matrix = Transform.ToMatrixWithScale();
-	UViewmodelMeshes::CalculateViewmodelMatrix(PLAYER->GetPlayerController(), ViewmodelData, Matrix);
+	if (PLAYER) UViewmodelMeshes::CalculateViewmodelMatrix(PLAYER->GetPlayerController(), ViewmodelData, Matrix);
 	return FTransform(Matrix);
 }
 

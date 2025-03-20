@@ -196,7 +196,7 @@ void ATreeActor::SetTreeChildActor_Internal(const TSubclassOf<ATreeChildActor>& 
 	//TODO: Access Violation -> ChildActorComponent 536 -> UObjectBaseUtility 278
 	TreeChildActor = CastChecked<ATreeChildActor>(TreeChildActorComponent->GetChildActor());
 	GetTreeChildActor()->Init();
-	if (PLAYER->IsActorLoaded(this)) {
+	if (PLAYER && PLAYER->IsActorLoaded(this)) {
 		GetTreeChildActor()->Load();
 		return;
 	}
