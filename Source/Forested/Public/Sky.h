@@ -72,7 +72,6 @@ public:
 	/**
 	* 0-0.25 is spring, 0.25-0.5 is summer, 0.5-0.75 is fall, 0.75-1 is winter
 	* assume season from day + time; spring starts on March 19, 20, or 21 (78/79/80); summer starts on June 20 or 21 (171/172); fall starts on September 22 or 23 (265/266); winter starts on December 21 or 22 (355/356);  (roughly 90 days per season)
-	* TODO: leap years
 	**/
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Sky")
 	float GetSeasonTime() const;

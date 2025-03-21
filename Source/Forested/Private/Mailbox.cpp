@@ -33,14 +33,15 @@ void AMailbox::BeginPlay() {
 
 bool AMailbox::Selected_Implementation(AFPlayer* Player, const FHitResult& HitResult, const float HeldTime) {
 	if (WidgetClass.IsNull()) return false;
-	FSerializationLibrary::LoadSync(WidgetClass);
-	MailboxWidget = CreateWidget<UMailboxWidget>(Player->GetPlayerController(), WidgetClass.Get());
-	MailboxWidget->AddToViewport(1);
-	MailboxWidget->ActivateMailboxWidget(this);
 
 	if (!Player->PlayerInventory->ClearSelectedItem(2.f)) {
 		return false;
 	}
+	
+	FSerializationLibrary::LoadSync(WidgetClass);
+	MailboxWidget = CreateWidget<UMailboxWidget>(Player->GetPlayerController(), WidgetClass.Get());
+	MailboxWidget->AddToViewport(1);
+	MailboxWidget->ActivateMailboxWidget(this);
 
 	Player->SetUIFocus(MailboxWidget);
 	Player->GetHud()->HideHud();

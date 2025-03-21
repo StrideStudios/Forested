@@ -193,7 +193,6 @@ void ATreeActor::SetTreeChildActor(const TSoftClassPtr<ATreeChildActor> InTreeAc
 void ATreeActor::SetTreeChildActor_Internal(const TSubclassOf<ATreeChildActor>& InTreeActorClass) {
 	TreeChildActorClass = InTreeActorClass;
 	TreeChildActorComponent->SetChildActorClass(TreeChildActorClass);
-	//TODO: Access Violation -> ChildActorComponent 536 -> UObjectBaseUtility 278
 	TreeChildActor = CastChecked<ATreeChildActor>(TreeChildActorComponent->GetChildActor());
 	GetTreeChildActor()->Init();
 	if (PLAYER && PLAYER->IsActorLoaded(this)) {

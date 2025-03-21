@@ -19,7 +19,6 @@ FItemHeap AItemShop::BuyItem(AFPlayer* Player, const int Slot) {
 			Player->AddMoney(-Cost);
 			OnBuyItem(Item, Player, Slot);
 			IBuyInterface::Execute_OnItemBought(Item, this);
-			//TODO: Come back to this
 			return Item;
 		}
 	}

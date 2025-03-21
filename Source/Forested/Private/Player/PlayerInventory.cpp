@@ -34,7 +34,6 @@ void UPlayerInventory::TickComponent(const float DeltaTime, const ELevelTick Tic
 	}
 }
 
-//TODO: can interact while montage playing
 bool UPlayerInventory::ClearSelectedItem(const float PlayRate) {
 	if (const UPlayerAnimInstance* PlayerAnimInstance = Cast<UPlayerAnimInstance>(Player->GetMesh()->GetAnimInstance())) {
 		if (!PlayerAnimInstance->CanSwitchItems()) return false;
@@ -271,9 +270,9 @@ bool UPlayerAnimInstance::HandleNotify(const FAnimNotifyEvent& AnimNotifyEvent) 
 		return true;
 	}
 	//TODO: this probably
-	if (AnimNotifyEvent.NotifyName == "AnimPause") {
-		return false;
-	}
+	//if (AnimNotifyEvent.NotifyName == "AnimPause") {
+		//return false;
+	//}
 	return false;
 }
 
@@ -319,7 +318,7 @@ void UPlayerAnimInstance::LoadAnimationData() {
 	//if current active montage is unequip, we stop it with blend
 	FAnimMontageInstance* Montage = UMontageLibrary::GetAnyActiveMontageInstance(this);
 	if (Montage && Montage->Montage && Montage->Montage == RenderActor->UnEquipAnimMontage) {
-		Montage->Stop(FAlphaBlend(Montage->GetBlendTime()), false);//TODO: Montage->GetBlend(), 
+		Montage->Stop(Montage->GetBlend(), false);
 	}
 
 	//deinit previous render actor

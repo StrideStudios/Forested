@@ -18,7 +18,6 @@ UPlayerInputComponent::UPlayerInputComponent() {
 	PrimaryComponentTick.bStartWithTickEnabled = true;
 }
 
-//TODO: right click dont work properly ;(
 void UPlayerInputComponent::BeginPlay() {
 	Super::BeginPlay();
 

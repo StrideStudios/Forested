@@ -27,9 +27,9 @@ class FORESTED_API UK2Node_ConstructItem : public UK2Node_ConstructObjectFromCla
 
 	//~ Begin UK2Node_ConstructObjectFromClass Interface
 	virtual UClass* GetClassPinBaseClass() const override;
-	//~ End UK2Node_ConstructObjectFromClass Interface
-
 	virtual bool UseOuter() const override { return false; }
+	//~ End UK2Node_ConstructObjectFromClass Interface
+	
 };
 
 #endif
