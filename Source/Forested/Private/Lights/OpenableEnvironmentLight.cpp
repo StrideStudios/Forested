@@ -5,7 +5,7 @@
 #include "Components/RectLightComponent.h"
 
 template <typename Pred>
-void FOpenableLightBase::Refresh(ULightComponent* LightComponent, AOpenableActor* OpenableActor, const bool bIsActiveOnOpen, Pred&& RefreshParent) {
+void Refresh(ULightComponent* LightComponent, AOpenableActor* OpenableActor, const bool bIsActiveOnOpen, Pred&& RefreshParent) {
 	if (OpenableActor) {
 
 		//if in editor world set intensity to final result
@@ -31,20 +31,35 @@ void FOpenableLightBase::Refresh(ULightComponent* LightComponent, AOpenableActor
 	LightComponent->SetVisibility(false);
 }
 
-void AOpenableEnvironmentPointLight::RefreshLight_Implementation(float DeltaTime, const ASky* Sky) {
-	FOpenableLightBase::Refresh(PointLight, OpenableActor, bActiveOnOpen, [this, DeltaTime, Sky] {
-		Super::RefreshLight_Implementation(DeltaTime, Sky);
+void AOpenableEnvironmentPointLight::RefreshLight(float DeltaTime, const ASky* Sky) {
+	if (!IsEnabled()) {
+		Super::RefreshLight(DeltaTime, Sky);
+		return;
+	}
+	if (!Sky) return;
+	Refresh(PointLight, OpenableActor, bActiveOnOpen, [this, DeltaTime, Sky] {
+		Super::RefreshLight(DeltaTime, Sky);
 	});
 }
 
-void AOpenableEnvironmentRectLight::RefreshLight_Implementation(float DeltaTime, const ASky* Sky) {
-	FOpenableLightBase::Refresh(RectLight, OpenableActor, bActiveOnOpen, [this, DeltaTime, Sky] {
-		Super::RefreshLight_Implementation(DeltaTime, Sky);
+void AOpenableEnvironmentRectLight::RefreshLight(float DeltaTime, const ASky* Sky) {
+	if (!IsEnabled()) {
+		Super::RefreshLight(DeltaTime, Sky);
+		return;
+	}
+	if (!Sky) return;
+	Refresh(RectLight, OpenableActor, bActiveOnOpen, [this, DeltaTime, Sky] {
+		Super::RefreshLight(DeltaTime, Sky);
 	});
 }
 
-void AOpenableEnvironmentBounceLight::RefreshLight_Implementation(float DeltaTime, const ASky* Sky) {
-	FOpenableLightBase::Refresh(BounceLight, OpenableActor, bActiveOnOpen, [this, DeltaTime, Sky] {
-		Super::RefreshLight_Implementation(DeltaTime, Sky);
+void AOpenableEnvironmentBounceLight::RefreshLight(float DeltaTime, const ASky* Sky) {
+	if (!IsEnabled()) {
+		Super::RefreshLight(DeltaTime, Sky);
+		return;
+	}
+	if (!Sky) return;
+	Refresh(BounceLight, OpenableActor, bActiveOnOpen, [this, DeltaTime, Sky] {
+		Super::RefreshLight(DeltaTime, Sky);
 	});
 }

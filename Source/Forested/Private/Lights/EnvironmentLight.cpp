@@ -8,6 +8,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 
+//TODO: add a condition or whatever when disabled it is removed from the sky update pool
 AEnvironmentLight::AEnvironmentLight() {
 	PrimaryActorTick.bCanEverTick = false;
 	
@@ -18,25 +19,49 @@ AEnvironmentLight::AEnvironmentLight() {
 void AEnvironmentLight::BeginPlay() {
 	Super::BeginPlay();
 	SKY->OnSkyUpdate.AddUniqueDynamic(this, &AEnvironmentLight::RefreshLight);
+	SKY->OnSkyUpdate.AddUniqueDynamic(this, &AEnvironmentLight::ReceiveRefreshLight);
+
 	RefreshLight(0.f, SKY);
 }
 
-void AEnvironmentLight::OnConstruction(const FTransform& Transform) {
-	const ASky* Sky = Cast<ASky>(UGameplayStatics::GetActorOfClass(this, ASky::StaticClass()));
-	if (!Sky) return;
-	RefreshLight(0.f, Sky);
-}
-
-void AEnvironmentLight::RefreshLight_Implementation(const float DeltaTime, const ASky* Sky) {
+void AEnvironmentLight::RefreshLight(const float DeltaTime, const ASky* Sky) {
+	if (!IsEnabled()) {
+		for (ULightComponent* LightComponent : GetLightComponents())
+			LightComponent->SetVisibility(false);
+		return;
+	}
 	if (!Sky) return;
 	const float Intensity = (Sky->IsNight() ? NightIntensity : DayIntensity) / 100.f * (IntensityCurve ? IntensityCurve->GetFloatValue(Sky->GetSunHeight()) : 1.f);
 	const float Temperature = Sky->IsNight() ? NightTemperature : DayTemperature;
 	const FLinearColor SkyColor = Sky->IsNight() ? Sky->Moon->GetLightColor() : Sky->SkyAtmosphere->GetAtmosphereTransmitanceOnGroundAtPlanetTop(Sky->Sun);
 	for (ULightComponent* LightComponent : GetLightComponents()) {
+		LightComponent->SetVisibility(true);
 		LightComponent->SetIntensity(Intensity);
 		LightComponent->SetTemperature(Temperature);
 		LightComponent->SetLightColor(SkyColor);
 	}
+}
+
+void AEnvironmentLight::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) {
+	if (PropertyChangedEvent.GetPropertyName() == GET_MEMBER_NAME_CHECKED(AEnvironmentLight, bEnabled) ||
+		PropertyChangedEvent.GetPropertyName() == GET_MEMBER_NAME_CHECKED(AEnvironmentLight, DayIntensity) ||
+		PropertyChangedEvent.GetPropertyName() == GET_MEMBER_NAME_CHECKED(AEnvironmentLight, NightIntensity) ||
+		PropertyChangedEvent.GetPropertyName() == GET_MEMBER_NAME_CHECKED(AEnvironmentLight, DayTemperature) ||
+		PropertyChangedEvent.GetPropertyName() == GET_MEMBER_NAME_CHECKED(AEnvironmentLight, NightTemperature)) {
+		RefreshLight(0.f, SKY);
+	}
+	
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+}
+
+void AEnvironmentLight::Enable()  {
+	bEnabled = true;
+	RefreshLight(0.f, SKY);
+}
+
+void AEnvironmentLight::Disable()  {
+	bEnabled = false;
+	RefreshLight(0.f, SKY);
 }
 
 AEnvironmentPointLight::AEnvironmentPointLight() {
@@ -95,18 +120,12 @@ void AEnvironmentBounceLight::BeginPlay() {
 	BounceLight->SetVisibility(BounceLight->Intensity > 0.f);
 }
 
-void AEnvironmentBounceLight::OnConstruction(const FTransform& Transform) {
-	const ASky* Sky = Cast<ASky>(UGameplayStatics::GetActorOfClass(this, ASky::StaticClass()));
+void AEnvironmentBounceLight::RefreshLight(const float DeltaTime, const ASky* Sky) {
+	if (!IsEnabled()) {
+		Super::RefreshLight(DeltaTime, Sky);
+		return;
+	}
 	if (!Sky) return;
-	//semi-refresh because the traces won't work (in the intended way) in construction
-	BounceLight->SetIntensity((Sky->IsNight() ? NightIntensity : DayIntensity) / 100.f * (IntensityCurve ? IntensityCurve->GetFloatValue(Sky->GetSunHeight()) : 1.f));
-	BounceLight->SetTemperature(Sky->IsNight() ? NightTemperature : DayTemperature);
-	BounceLight->SetLightColor(Sky->IsNight() ? Sky->Moon->GetLightColor() : Sky->SkyAtmosphere->GetAtmosphereTransmitanceOnGroundAtPlanetTop(Sky->Sun));
-	BounceLight->SetWorldLocation(GetActorLocation());
-	BounceLight->SetVisibility(BounceLight->Intensity > 0.f);
-}
-
-void AEnvironmentBounceLight::RefreshLight_Implementation(const float DeltaTime, const ASky* Sky) {
 #if WITH_EDITOR
 	LightDirection->SetWorldRotation(Sky->Sun->GetComponentRotation());
 #endif
@@ -157,8 +176,8 @@ void AEnvironmentBounceLight::RefreshLight_Implementation(const float DeltaTime,
 	}
 	
 	NewLocation = HitResult.Location + Sky->GetLightDirection() * -1.f * BounceSeparate + HitResult.Normal * NormalBounceSeparate;
-	NewIntensity = (Sky->IsNight() ? NightIntensity : DayIntensity) / 100.f * (IntensityCurve ? IntensityCurve->GetFloatValue(Sky->GetSunHeight()) : 1.f) * FMath::Clamp(BounceDirectionalIntensity, 0.f, 1.f);
-	BounceLight->SetTemperature(Sky->IsNight() ? NightTemperature : DayTemperature);
+	NewIntensity = (Sky->IsNight() ? GetNightIntensity() : GetDayIntensity()) / 100.f * (GetIntensityCurve() ? GetIntensityCurve()->GetFloatValue(Sky->GetSunHeight()) : 1.f) * FMath::Clamp(BounceDirectionalIntensity, 0.f, 1.f);
+	BounceLight->SetTemperature(Sky->IsNight() ? GetNightTemperature() : GetDayTemperature());
 	BounceLight->SetLightColor(Sky->IsNight() ? Sky->Moon->GetLightColor() : Sky->SkyAtmosphere->GetAtmosphereTransmitanceOnGroundAtPlanetTop(Sky->Sun));
 
 	//if it isn't visible there isn't a purpose to interpolating its location
@@ -168,3 +187,27 @@ void AEnvironmentBounceLight::RefreshLight_Implementation(const float DeltaTime,
 }
 
 TArray<ULightComponent*> AEnvironmentBounceLight::GetLightComponents() const { return { BounceLight }; }
+
+/*
+		const ASky* Sky = Cast<ASky>(UGameplayStatics::GetActorOfClass(this, ASky::StaticClass()));
+		if (!Sky) return;
+		//semi-refresh because the traces won't work in the intended way here
+		BounceLight->SetIntensity((Sky->IsNight() ? GetNightIntensity() : GetDayIntensity()) / 100.f * (GetIntensityCurve() ? GetIntensityCurve()->GetFloatValue(Sky->GetSunHeight()) : 1.f));
+		BounceLight->SetTemperature(Sky->IsNight() ? GetNightTemperature() : GetDayTemperature());
+		BounceLight->SetLightColor(Sky->IsNight() ? Sky->Moon->GetLightColor() : Sky->SkyAtmosphere->GetAtmosphereTransmitanceOnGroundAtPlanetTop(Sky->Sun));
+		BounceLight->SetWorldLocation(GetActorLocation());
+		BounceLight->SetVisibility(BounceLight->Intensity > 0.f);
+ */
+
+void AEnvironmentBounceLight::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) {
+	if (PropertyChangedEvent.GetPropertyName() == GET_MEMBER_NAME_CHECKED(AEnvironmentBounceLight, IgnoredActors) ||
+		PropertyChangedEvent.GetPropertyName() == GET_MEMBER_NAME_CHECKED(AEnvironmentBounceLight, DrawDebug) ||
+		PropertyChangedEvent.GetPropertyName() == GET_MEMBER_NAME_CHECKED(AEnvironmentBounceLight, BounceSeparate) ||
+		PropertyChangedEvent.GetPropertyName() == GET_MEMBER_NAME_CHECKED(AEnvironmentBounceLight, NormalBounceSeparate) ||
+		PropertyChangedEvent.GetPropertyName() == GET_MEMBER_NAME_CHECKED(AEnvironmentBounceLight, BounceStartDistance) ||
+		PropertyChangedEvent.GetPropertyName() == GET_MEMBER_NAME_CHECKED(AEnvironmentBounceLight, BounceEndDistance)) {
+		RefreshLight(0.f, SKY);
+	}
+	
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+}

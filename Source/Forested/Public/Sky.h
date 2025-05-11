@@ -397,8 +397,8 @@ protected:
 	 */
 
 	//Adds a timed event, fires once upon completion
-	UFUNCTION(BlueprintCallable, meta=(BlueprintInternalUseOnly = "true"), Category = "Timed Events")
-	static UTimedEventAsyncAction* AddTimedEvent(const float ExecuteTime = 0.f);
+	UFUNCTION(BlueprintCallable, meta=(WorldContext = "WorldContextObject", BlueprintInternalUseOnly = "true"), Category = "Timed Events")
+	static UTimedEventAsyncAction* AddTimedEvent(const UObject* WorldContextObject, const float ExecuteTime = 0.f);
 
 	virtual void Activate() override;
 };
@@ -428,8 +428,8 @@ protected:
 	 */
 	
 	//Add a timer, this fires every frame until completed
-	UFUNCTION(BlueprintCallable, meta=(BlueprintInternalUseOnly = "true"), Category = "Timed Events")
-	static UTimerAsyncAction* AddTimer(const float ExecuteTime = 0.f);
+	UFUNCTION(BlueprintCallable, meta=(WorldContext = "WorldContextObject", BlueprintInternalUseOnly = "true"), Category = "Timed Events")
+	static UTimerAsyncAction* AddTimer(const UObject* WorldContextObject, const float ExecuteTime = 0.f);
 
 	virtual void Activate() override;
 };
@@ -454,8 +454,8 @@ protected:
 	 */
 	
 	//Add a frame delay, fires after one frame
-	UFUNCTION(BlueprintCallable, meta=(BlueprintInternalUseOnly = "true"), Category = "Timed Events")
-	static UFrameDelayAsyncAction* AddFrameDelay();
+	UFUNCTION(BlueprintCallable, meta=(WorldContext = "WorldContextObject", BlueprintInternalUseOnly = "true"), Category = "Timed Events")
+	static UFrameDelayAsyncAction* AddFrameDelay(const UObject* WorldContextObject);
 
 	virtual void Activate() override;
 };

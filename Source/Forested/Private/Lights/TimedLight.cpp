@@ -16,24 +16,52 @@ ATimedLight::ATimedLight() {
 void ATimedLight::BeginPlay() {
 	Super::BeginPlay();
 	SKY->OnSkyUpdate.AddUniqueDynamic(this, &ATimedLight::RefreshLight);
+	SKY->OnSkyUpdate.AddUniqueDynamic(this, &ATimedLight::ReceiveRefreshLight);
+	
 	RefreshLight(0.f, SKY);
 }
 
-void ATimedLight::OnConstruction(const FTransform& Transform) {
-	const ASky* Sky = Cast<ASky>(UGameplayStatics::GetActorOfClass(this, ASky::StaticClass()));
-	if (!Sky) return;
-	RefreshLight(0.f, Sky);
-}
-
-void ATimedLight::RefreshLight_Implementation(const float DeltaTime, const ASky* Sky) {
+void ATimedLight::RefreshLight(const float DeltaTime, const ASky* Sky) {
+	if (!IsEnabled()) {
+		for (ULightComponent* LightComponent : GetLightComponents())
+			LightComponent->SetVisibility(false);
+		return;
+	}
 	if (!Sky) return;
 	const float SunHeight = Sky->GetSunHeight();
-	const bool bShouldBeEnabled = SunHeight >= MinTime && SunHeight <= MaxTime;
+	const bool bShouldBeEnabled = SunHeight >= GetStartTime() && SunHeight <= GetEndTime();
 	const float Intensity = IntensityCurve ? IntensityCurve->GetFloatValue(SunHeight) : 1.f;
 	for (ULightComponent* LightComponent : GetLightComponents()) {
 		LightComponent->SetVisibility(bShouldBeEnabled && Intensity > 0.f);
 		if (!LightComponent->IsVisible()) continue;
 		LightComponent->SetIntensity(LightComponent->Intensity * Intensity);
+	}
+}
+
+void ATimedLight::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) {
+	if (PropertyChangedEvent.GetPropertyName() == GET_MEMBER_NAME_CHECKED(ATimedLight, StartTime) ||
+		PropertyChangedEvent.GetPropertyName() == GET_MEMBER_NAME_CHECKED(ATimedLight, EndTime)) {
+		RefreshLight(0.f, SKY);
+	}
+
+	if (PropertyChangedEvent.GetPropertyName() == GET_MEMBER_NAME_CHECKED(ATimedLight, bEnabled)) {
+		// Ensure Lights are Disabled when unchecked
+		SetEnabled(IsEnabled());
+	}
+	
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+}
+
+void ATimedLight::Enable()  {
+	bEnabled = true;
+	RefreshLight(0.f, SKY);
+}
+
+void ATimedLight::Disable()  {
+	bEnabled = false;
+	// Custom Update to ensure lights are disabled
+	for (ULightComponent* LightComponent : GetLightComponents()) {
+		LightComponent->SetVisibility(false);
 	}
 }
 

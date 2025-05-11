@@ -22,27 +22,85 @@ protected:
 	
 public:
 	
-	virtual void OnConstruction(const FTransform& Transform) override;
-	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	USceneComponent* Root;
 	
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Timed Light")
-	void RefreshLight(float DeltaTime, const ASky* Sky);
-	virtual void RefreshLight_Implementation(float DeltaTime, const ASky* Sky);
+	UFUNCTION(BlueprintCallable, Category = "Timed Light")
+	virtual void RefreshLight(float DeltaTime, const ASky* Sky);
+
+	UFUNCTION(BlueprintImplementableEvent, DisplayName = "Refresh Light")
+	void ReceiveRefreshLight(float DeltaTime, const ASky* Sky);
 
 	virtual TArray<ULightComponent*> GetLightComponents() const {
 		return {};
 	}
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Base")
+#if WITH_EDITOR
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+#endif
+
+	/*
+	 * Getters
+	 */
+
+	UFUNCTION(BlueprintGetter, Category = "Timed Light|Intensity")
+	UCurveFloat* GetIntensityCurve() const { return IntensityCurve; }
+
+	UFUNCTION(BlueprintGetter, Category = "Timed Light|Visibility")
+	bool IsEnabled() const { return bEnabled; }
+
+	UFUNCTION(BlueprintGetter, Category = "Timed Light|Visibility")
+	float GetStartTime() const { return StartTime; }
+
+	UFUNCTION(BlueprintGetter, Category = "Timed Light|Visibility")
+	float GetEndTime() const { return EndTime; }
+
+	/*
+	 * Setters
+	 */
+
+	UFUNCTION(BlueprintCallable, Category = "Timed Light|Visibility")
+	void Enable();
+
+	UFUNCTION(BlueprintCallable, Category = "Timed Light|Visibility")
+	void Disable();
+
+	UFUNCTION(BlueprintSetter, Category = "Timed Light|Visibility")
+	void SetEnabled(const bool InEnabled) {
+		if (InEnabled) {
+			Enable();
+			return;
+		}
+		Disable();
+	}
+
+	UFUNCTION(BlueprintSetter, Category = "Timed Light|Visibility")
+	void SetStartTime(const float InStartTime) {
+		StartTime = InStartTime;
+		RefreshLight(0.f, SKY);
+	}
+
+	UFUNCTION(BlueprintSetter, Category = "Timed Light|Visibility")
+	void SetEndTime(const float InEndTime) {
+		EndTime = InEndTime;
+		RefreshLight(0.f, SKY);
+	}
+	
+private:
+
+	UPROPERTY(EditDefaultsOnly, Category = "Base")
 	UCurveFloat* IntensityCurve = nullptr;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Base")
-	float MinTime = -1.f;
+	UPROPERTY(EditAnywhere, Category = "Base")
+	bool bEnabled = true;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Base")
-	float MaxTime = 0.f;
+	// The activation time required to activate this light
+	UPROPERTY(EditAnywhere, Category = "Base", meta = (ClampMin = "-1", ClampMax = "1", UIMin = "-1", UIMax = "1"))
+	float StartTime = -1.f;
+
+	// The de-activation time required to activate this light
+	UPROPERTY(EditAnywhere, Category = "Base", meta = (ClampMin = "-1", ClampMax = "1", UIMin = "-1", UIMax = "1"))
+	float EndTime = 0.f;
 
 };
 

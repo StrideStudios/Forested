@@ -356,9 +356,9 @@ void ASky::AddFrameDelay(const TDelegateWrapper<FFrameDelayDelegate>& Complete) 
 	PendingFrameDelays.Emplace(Complete);
 }
 
-UTimedEventAsyncAction* UTimedEventAsyncAction::AddTimedEvent(const float ExecuteTime) {
+UTimedEventAsyncAction* UTimedEventAsyncAction::AddTimedEvent(const UObject* WorldContextObject, const float ExecuteTime) {
 	UTimedEventAsyncAction* Node = NewObject<UTimedEventAsyncAction>();
-	Node->Sky = SKY;
+	Node->Sky = GET_SKY(WorldContextObject);
 	Node->ExecuteTime = ExecuteTime;
 	return Node;
 }
@@ -369,9 +369,9 @@ void UTimedEventAsyncAction::Activate() {
 	});
 }
 
-UTimerAsyncAction* UTimerAsyncAction::AddTimer(const float ExecuteTime) {
+UTimerAsyncAction* UTimerAsyncAction::AddTimer(const UObject* WorldContextObject, const float ExecuteTime) {
 	UTimerAsyncAction* Node = NewObject<UTimerAsyncAction>();
-	Node->Sky = SKY;
+	Node->Sky = GET_SKY(WorldContextObject);
 	Node->ExecuteTime = ExecuteTime;
 	return Node;
 }
@@ -384,9 +384,9 @@ void UTimerAsyncAction::Activate() {
 	});
 }
 
-UFrameDelayAsyncAction* UFrameDelayAsyncAction::AddFrameDelay() {
+UFrameDelayAsyncAction* UFrameDelayAsyncAction::AddFrameDelay(const UObject* WorldContextObject) {
 	UFrameDelayAsyncAction* Node = NewObject<UFrameDelayAsyncAction>();
-	Node->Sky = SKY;
+	Node->Sky = GET_SKY(WorldContextObject);
 	return Node;
 }
 

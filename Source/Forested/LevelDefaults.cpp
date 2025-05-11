@@ -5,28 +5,34 @@
 #include "Kismet/GameplayStatics.h"
 #include "Forested/ForestedMinimal.h"
 
-AForestedGameMode* ULevelDefaults::ForestedGameMode = nullptr;
-AFPlayer* ULevelDefaults::Player = nullptr;
 ASky* ULevelDefaults::Sky = nullptr;
 
+AForestedGameMode* ULevelDefaults::ForestedGameMode = nullptr;
+AFPlayer* ULevelDefaults::Player = nullptr;
+
 template <class UserClass>
-UserClass* GetActor(UObject* WorldContextObject) {
+UserClass* GetActor(const UObject* WorldContextObject) {
 	if (!WorldContextObject) return nullptr;
-	LOG_WARNING("Attempted to get actor from world in level defaults for actor class %s", *UserClass::StaticClass()->GetName());
 	return Cast<UserClass>(UGameplayStatics::GetActorOfClass(WorldContextObject, UserClass::StaticClass()));
 }
 
 void ULevelDefaults::StartPlay(const UWorld* World, AForestedGameMode* InForestedGameMode) {
+	Sky = GetActor<ASky>(World);
+	
 	ForestedGameMode = InForestedGameMode;
 	Player = Cast<AFPlayer>(UGameplayStatics::GetPlayerCharacter(World, 0));
-	Sky = Cast<ASky>(UGameplayStatics::GetActorOfClass(World, ASky::StaticClass()));
 }
 
 void ULevelDefaults::EndPlay() {
 	//since these are static variables they need to be reset once the game ends
+	Sky = nullptr;
+	
 	ForestedGameMode = nullptr;
 	Player = nullptr;
-	Sky = nullptr;
+}
+
+ASky* ULevelDefaults::GetSky(const UObject* WorldContextObject) {
+	return Sky ? Sky : GetActor<ASky>(WorldContextObject);
 }
 
 AForestedGameMode* ULevelDefaults::GetForestedGameMode() {
@@ -34,10 +40,6 @@ AForestedGameMode* ULevelDefaults::GetForestedGameMode() {
 	return ForestedGameMode;
 }
 
-AFPlayer* ULevelDefaults::GetPlayer(UObject* WorldContextObject) {
-	return Player ? Player : GetActor<AFPlayer>(WorldContextObject);
-}
-
-ASky* ULevelDefaults::GetSky(UObject* WorldContextObject) {
-	return Sky ? Sky : GetActor<ASky>(WorldContextObject);
+AFPlayer* ULevelDefaults::GetPlayer() {
+	return Player;
 }

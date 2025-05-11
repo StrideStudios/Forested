@@ -433,6 +433,10 @@
 		{
 			"Name": "CableComponent",
 			"Enabled": false
+		},
+		{
+			"Name": "GPAPlugin",
+			"Enabled": true
 		}
 	],
 	"TargetPlatforms": [

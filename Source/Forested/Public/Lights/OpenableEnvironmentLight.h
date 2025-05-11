@@ -10,20 +10,13 @@ class ASky;
 class UPointLightComponent;
 class URectLightComponent;
 
-struct FOpenableLightBase final {
-
-	template <typename Pred>
-	static void Refresh(ULightComponent* LightComponent, AOpenableActor* OpenableActor, bool bIsActiveOnOpen, Pred&& RefreshParent);
-	
-};
-
 UCLASS(meta=(PrioritizeCategories = "Openable"))
 class AOpenableEnvironmentPointLight : public AEnvironmentPointLight {
 	GENERATED_BODY()
 
 public:
 	
-	virtual void RefreshLight_Implementation(float DeltaTime, const ASky* Sky) override;
+	virtual void RefreshLight(float DeltaTime, const ASky* Sky) override;
 
 protected:
 
@@ -41,7 +34,7 @@ class AOpenableEnvironmentRectLight : public AEnvironmentRectLight {
 
 public:
 	
-	virtual void RefreshLight_Implementation(float DeltaTime, const ASky* Sky) override;
+	virtual void RefreshLight(float DeltaTime, const ASky* Sky) override;
 
 protected:
 
@@ -59,7 +52,7 @@ class AOpenableEnvironmentBounceLight : public AEnvironmentBounceLight {
 
 public:
 	
-	virtual void RefreshLight_Implementation(float DeltaTime, const ASky* Sky) override;
+	virtual void RefreshLight(float DeltaTime, const ASky* Sky) override;
 
 protected:
 
